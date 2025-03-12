@@ -1,0 +1,1049 @@
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Advanced SEO ROI Calculator</title>
+              <!-- Google Fonts -->
+              <link rel="preconnect" href="https://fonts.googleapis.com">
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+              <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+              <style>
+                  /* Reset and Base Styles */
+                  * {
+                      margin: 0;
+                      padding: 0;
+                      box-sizing: border-box;
+                  }
+
+                  body {
+                      font-family: 'Roboto', sans-serif;
+                      font-weight: 300;
+                      font-size: 18px;
+                      line-height: 25px;
+                      color: #000;
+                      background-color: #f5f5f5;
+                  }
+
+                  /* Typography */
+                  h1 {
+                      font-family: 'Oswald', sans-serif;
+                      font-weight: 400;
+                      font-size: 50px;
+                      line-height: 60px;
+                      text-align: center;
+                      margin: 30px 0;
+                  }
+
+                  h2 {
+                      font-family: 'Oswald', sans-serif;
+                      font-weight: 400;
+                      font-size: 32px;
+                      line-height: 42px;
+                      margin: 20px 0;
+                  }
+
+                  /* Container */
+                  .container {
+                      max-width: 1200px;
+                      margin: 0 auto;
+                      padding: 20px;
+                  }
+
+                  /* Calculator Card */
+                  .calculator-card {
+                      background-color: white;
+                      border-radius: 12px;
+                      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                      padding: 30px;
+                      margin-bottom: 30px;
+                  }
+
+                  /* Form Styles */
+                  .form-group {
+                      margin-bottom: 25px;
+                  }
+
+                  label {
+                      display: block;
+                      margin-bottom: 8px;
+                      font-weight: 400;
+                  }
+
+                  .input-group {
+                      display: flex;
+                      align-items: center;
+                  }
+
+                  .input-group span {
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      background-color: #f1f1f1;
+                      border: 1px solid #ddd;
+                      border-right: none;
+                      padding: 10px 15px;
+                      border-radius: 5px 0 0 5px;
+                      font-weight: 400;
+                  }
+
+                  input[type="number"],
+                  input[type="text"],
+                  select {
+                      width: 100%;
+                      padding: 12px 15px;
+                      border: 1px solid #ddd;
+                      border-radius: 5px;
+                      font-family: 'Roboto', sans-serif;
+                      font-size: 16px;
+                  }
+
+                  .input-group input {
+                      border-radius: 0 5px 5px 0;
+                  }
+
+                  /* Button Styles */
+                  .btn {
+                      display: inline-block;
+                      background-color: #0093fe;
+                      color: white;
+                      border: none;
+                      padding: 15px 30px;
+                      border-radius: 5px;
+                      font-family: 'Roboto', sans-serif;
+                      font-size: 18px;
+                      font-weight: 400;
+                      cursor: pointer;
+                      transition: background-color 0.3s;
+                      text-transform: uppercase;
+                      letter-spacing: 1px;
+                  }
+
+                  .btn:hover {
+                      background-color: #0077cc;
+                  }
+
+                  .btn-container {
+                      text-align: center;
+                      margin: 30px 0;
+                  }
+
+                  /* Results Section */
+                  .results {
+                      display: none;
+                      margin-top: 40px;
+                  }
+
+                  .results.show {
+                      display: block;
+                  }
+
+                  .results-card {
+                      background-color: white;
+                      border-radius: 12px;
+                      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                      padding: 30px;
+                      margin-bottom: 30px;
+                  }
+
+                  .result-item {
+                      display: flex;
+                      justify-content: space-between;
+                      border-bottom: 1px solid #eee;
+                      padding: 15px 0;
+                  }
+
+                  .result-item:last-child {
+                      border-bottom: none;
+                  }
+
+                  .result-label {
+                      font-weight: 400;
+                  }
+
+                  .result-value {
+                      font-weight: 400;
+                      color: #0093fe;
+                  }
+
+                  .highlight {
+                      font-size: 24px;
+                      color: #0093fe;
+                      font-weight: bold;
+                  }
+
+                  /* Charts */
+                  .chart-container {
+                      margin-top: 30px;
+                      height: 300px;
+                  }
+
+                  /* Tooltips */
+                  .tooltip {
+                      position: relative;
+                      display: inline-block;
+                      margin-left: 8px;
+                      cursor: help;
+                  }
+
+                  .tooltip-icon {
+                      display: inline-flex;
+                      align-items: center;
+                      justify-content: center;
+                      width: 20px;
+                      height: 20px;
+                      border-radius: 50%;
+                      background-color: #0093fe;
+                      color: white;
+                      font-size: 14px;
+                      font-weight: bold;
+                  }
+
+                  .tooltip-text {
+                      visibility: hidden;
+                      width: 250px;
+                      background-color: #333;
+                      color: white;
+                      text-align: center;
+                      border-radius: 6px;
+                      padding: 10px;
+                      position: absolute;
+                      z-index: 1;
+                      bottom: 125%;
+                      left: 50%;
+                      transform: translateX(-50%);
+                      opacity: 0;
+                      transition: opacity 0.3s;
+                      font-size: 14px;
+                      line-height: 1.4;
+                  }
+
+                  .tooltip:hover .tooltip-text {
+                      visibility: visible;
+                      opacity: 1;
+                  }
+
+                  /* Additional Inputs */
+                  .additional-inputs {
+                      margin-top: 30px;
+                      padding-top: 20px;
+                      border-top: 1px solid #eee;
+                  }
+
+                  .toggle-advanced {
+                      display: block;
+                      text-align: center;
+                      color: #0093fe;
+                      text-decoration: none;
+                      margin: 20px 0;
+                      font-weight: 400;
+                      cursor: pointer;
+                  }
+
+                  /* Advanced Inputs */
+                  .advanced-inputs {
+                      display: none;
+                  }
+
+                  .advanced-inputs.show {
+                      display: block;
+                  }
+
+                  /* Tabs */
+                  .tabs {
+                      display: flex;
+                      margin-bottom: 20px;
+                      border-bottom: 1px solid #ddd;
+                  }
+
+                  .tab {
+                      padding: 10px 20px;
+                      cursor: pointer;
+                      border-bottom: 3px solid transparent;
+                  }
+
+                  .tab.active {
+                      border-bottom-color: #0093fe;
+                      font-weight: 400;
+                      color: #0093fe;
+                  }
+
+                  .tab-content {
+                      display: none;
+                  }
+
+                  .tab-content.active {
+                      display: block;
+                  }
+
+                  /* Helper Text */
+                  .helper-text {
+                      font-size: 14px;
+                      color: #666;
+                      margin-top: 5px;
+                  }
+
+                  /* Responsive Styles */
+                  @media (max-width: 768px) {
+                      h1 {
+                          font-size: 40px;
+                          line-height: 50px;
+                      }
+
+                      h2 {
+                          font-size: 26px;
+                          line-height: 36px;
+                      }
+
+                      body {
+                          font-size: 16px;
+                          line-height: 22px;
+                      }
+
+                      .calculator-card,
+                      .results-card {
+                          padding: 20px;
+                      }
+
+                      .result-item {
+                          flex-direction: column;
+                      }
+
+                      .result-value {
+                          margin-top: 5px;
+                      }
+                  }
+
+                  @media (max-width: 480px) {
+                      h1 {
+                          font-size: 30px;
+                          line-height: 40px;
+                      }
+
+                      h2 {
+                          font-size: 22px;
+                          line-height: 30px;
+                      }
+
+                      .btn {
+                          width: 100%;
+                      }
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>Advanced SEO ROI Calculator</h1>
+
+                  <div class="calculator-card">
+                      <p>Find out exactly how much return on investment (ROI) your SEO efforts are generating. Enter your data below for a comprehensive analysis.</p>
+
+                      <div class="tabs">
+                          <div class="tab active" data-tab="basic">Basic Calculator</div>
+                          <div class="tab" data-tab="advanced">Advanced Options</div>
+                      </div>
+
+                      <div class="tab-content active" data-tab-content="basic">
+                          <form id="roi-calculator-form">
+                              <div class="form-group">
+                                  <label for="keywords">Number of Keywords Ranking on 1st Page <span class="required">*</span>
+                                      <div class="tooltip">
+                                          <span class="tooltip-icon">?</span>
+                                          <span class="tooltip-text">Enter the number of keywords your website ranks for on the first page of search results.</span>
+                                      </div>
+                                  </label>
+                                  <input type="number" id="keywords" name="keywords" min="0" required>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="avg-monthly-sv">Average Monthly Search Volume per Keyword <span class="required">*</span>
+                                      <div class="tooltip">
+                                          <span class="tooltip-icon">?</span>
+                                          <span class="tooltip-text">The estimated average monthly search volume for your targeted keywords.</span>
+                                      </div>
+                                  </label>
+                                  <input type="number" id="avg-monthly-sv" name="avg-monthly-sv" min="0" required>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="click-through-rate">Estimated Click-Through Rate (%) <span class="required">*</span>
+                                      <div class="tooltip">
+                                          <span class="tooltip-icon">?</span>
+                                          <span class="tooltip-text">The percentage of users who click on your website in search results.</span>
+                                      </div>
+                                  </label>
+                                  <div class="input-group">
+                                      <input type="number" id="click-through-rate" name="click-through-rate" min="0" max="100" required>
+                                      <span>%</span>
+                                  </div>
+                                  <p class="helper-text">Average CTR for 1st page results ranges from 3-30%</p>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="conversion-rate">Conversion Rate (%) <span class="required">*</span>
+                                      <div class="tooltip">
+                                          <span class="tooltip-icon">?</span>
+                                          <span class="tooltip-text">The percentage of visitors who complete a desired action (e.g., purchase, sign-up).</span>
+                                      </div>
+                                  </label>
+                                  <div class="input-group">
+                                      <input type="number" id="conversion-rate" name="conversion-rate" min="0" max="100" step="0.1" required>
+                                      <span>%</span>
+                                  </div>
+                                  <p class="helper-text">Average conversion rates range from 1-5%</p>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="avg-order-value">Average Order Value / Customer Value <span class="required">*</span>
+                                      <div class="tooltip">
+                                          <span class="tooltip-icon">?</span>
+                                          <span class="tooltip-text">The average amount of money a customer spends per transaction.</span>
+                                      </div>
+                                  </label>
+                                  <div class="input-group">
+                                      <span>$</span>
+                                      <input type="number" id="avg-order-value" name="avg-order-value" min="0" step="0.01" required>
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="seo-investment">Monthly SEO Investment <span class="required">*</span>
+                                      <div class="tooltip">
+                                          <span class="tooltip-icon">?</span>
+                                          <span class="tooltip-text">Your monthly spend on SEO efforts (agency fees, in-house costs, tools, etc.).</span>
+                                      </div>
+                                  </label>
+                                  <div class="input-group">
+                                      <span>$</span>
+                                      <input type="number" id="seo-investment" name="seo-investment" min="0" step="0.01" required>
+                                  </div>
+                              </div>
+
+                              <div class="additional-inputs">
+                                  <a class="toggle-advanced">+ Show Advanced Options</a>
+
+                                  <div class="advanced-inputs">
+                                      <div class="form-group">
+                                          <label for="lifetime-value-multiplier">Customer Lifetime Value Multiplier
+                                              <div class="tooltip">
+                                                  <span class="tooltip-icon">?</span>
+                                                  <span class="tooltip-text">How many times a customer is likely to purchase from you over their lifetime.</span>
+                                              </div>
+                                          </label>
+                                          <input type="number" id="lifetime-value-multiplier" name="lifetime-value-multiplier" min="1" value="1" step="0.1">
+                                          <p class="helper-text">Default: 1 (single purchase). Enter more than 1 for repeat customers.</p>
+                                      </div>
+
+                                      <div class="form-group">
+                                          <label for="profit-margin">Profit Margin (%)
+                                              <div class="tooltip">
+                                                  <span class="tooltip-icon">?</span>
+                                                  <span class="tooltip-text">The percentage of revenue that is profit after costs.</span>
+                                              </div>
+                                          </label>
+                                          <div class="input-group">
+                                              <input type="number" id="profit-margin" name="profit-margin" min="0" max="100" value="50" step="0.1">
+                                              <span>%</span>
+                                          </div>
+                                          <p class="helper-text">Default: 50%</p>
+                                      </div>
+
+                                      <div class="form-group">
+                                          <label for="time-period">Time Period for Calculation (Months)
+                                              <div class="tooltip">
+                                                  <span class="tooltip-icon">?</span>
+                                                  <span class="tooltip-text">The time period over which you want to calculate your ROI.</span>
+                                              </div>
+                                          </label>
+                                          <input type="number" id="time-period" name="time-period" min="1" value="12" step="1">
+                                          <p class="helper-text">Default: 12 months (1 year)</p>
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <div class="btn-container">
+                                  <button type="submit" class="btn" id="calculate-btn">Calculate ROI</button>
+                              </div>
+                          </form>
+                      </div>
+
+                      <div class="tab-content" data-tab-content="advanced">
+                          <form id="advanced-calculator-form">
+                              <div class="form-group">
+                                  <label for="seo-campaign-goal">SEO Campaign Goal</label>
+                                  <select id="seo-campaign-goal" name="seo-campaign-goal">
+                                      <option value="leads">Lead Generation</option>
+                                      <option value="sales">E-commerce Sales</option>
+                                      <option value="traffic">Traffic Growth</option>
+                                      <option value="brand">Brand Awareness</option>
+                                  </select>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="current-rankings">Current Website Status</label>
+                                  <select id="current-rankings" name="current-rankings">
+                                      <option value="new">New Website (No Rankings)</option>
+                                      <option value="low">Some Keywords on Page 2-3</option>
+                                      <option value="medium">Some Keywords on Page 1</option>
+                                      <option value="high">Many Keywords on Page 1</option>
+                                  </select>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="competition-level">Industry Competition Level</label>
+                                  <select id="competition-level" name="competition-level">
+                                      <option value="low">Low Competition</option>
+                                      <option value="medium">Medium Competition</option>
+                                      <option value="high">High Competition</option>
+                                  </select>
+                              </div>
+
+                              <h2>SEO Investment Breakdown</h2>
+
+                              <div class="form-group">
+                                  <label for="content-investment">Content Creation</label>
+                                  <div class="input-group">
+                                      <span>$</span>
+                                      <input type="number" id="content-investment" name="content-investment" min="0" value="0" step="0.01">
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="link-building-investment">Link Building</label>
+                                  <div class="input-group">
+                                      <span>$</span>
+                                      <input type="number" id="link-building-investment" name="link-building-investment" min="0" value="0" step="0.01">
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="technical-seo-investment">Technical SEO</label>
+                                  <div class="input-group">
+                                      <span>$</span>
+                                      <input type="number" id="technical-seo-investment" name="technical-seo-investment" min="0" value="0" step="0.01">
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="local-seo-investment">Local SEO</label>
+                                  <div class="input-group">
+                                      <span>$</span>
+                                      <input type="number" id="local-seo-investment" name="local-seo-investment" min="0" value="0" step="0.01">
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                  <label for="tools-investment">SEO Tools & Software</label>
+                                  <div class="input-group">
+                                      <span>$</span>
+                                      <input type="number" id="tools-investment" name="tools-investment" min="0" value="0" step="0.01">
+                                  </div>
+                              </div>
+
+                              <div class="btn-container">
+                                  <button type="submit" class="btn" id="advanced-calculate-btn">Calculate Detailed ROI</button>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+
+                  <div class="results" id="results">
+                      <h2>Your SEO ROI Results</h2>
+
+                      <div class="results-card">
+                          <div class="result-item">
+                              <span class="result-label">Estimated Monthly Organic Traffic:</span>
+                              <span class="result-value" id="monthly-traffic">0</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Estimated Monthly Conversions:</span>
+                              <span class="result-value" id="monthly-conversions">0</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Estimated Monthly Revenue:</span>
+                              <span class="result-value" id="monthly-revenue">$0</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Monthly SEO Cost:</span>
+                              <span class="result-value" id="monthly-cost">$0</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Monthly ROI:</span>
+                              <span class="result-value highlight" id="monthly-roi">0%</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Annual ROI:</span>
+                              <span class="result-value highlight" id="annual-roi">0%</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Return for every $1 spent:</span>
+                              <span class="result-value highlight" id="dollar-return">$0</span>
+                          </div>
+                      </div>
+
+                      <div class="chart-container" id="roi-chart">
+                          <!-- Chart will be inserted here -->
+                      </div>
+
+                      <h2>SEO Investment Analysis</h2>
+
+                      <div class="results-card">
+                          <div class="result-item">
+                              <span class="result-label">Break-even Point:</span>
+                              <span class="result-value" id="breakeven-point">0 months</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Estimated Total Revenue (12 months):</span>
+                              <span class="result-value" id="annual-revenue">$0</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Estimated Total Profit (12 months):</span>
+                              <span class="result-value" id="annual-profit">$0</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Total SEO Investment (12 months):</span>
+                              <span class="result-value" id="annual-investment">$0</span>
+                          </div>
+
+                          <div class="result-item">
+                              <span class="result-label">Net Profit After SEO Costs (12 months):</span>
+                              <span class="result-value highlight" id="net-profit">$0</span>
+                          </div>
+                      </div>
+
+                      <h2>Recommendations</h2>
+
+                      <div class="results-card">
+                          <div id="recommendations">
+                              <!-- Recommendations will be inserted here -->
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Chart.js Library -->
+              <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+              <script>
+                  // Set default values on load
+                  document.addEventListener('DOMContentLoaded', function() {
+                      // Set default values for basic calculator
+                      document.getElementById('click-through-rate').value = 3.5;
+                      document.getElementById('conversion-rate').value = 2.5;
+                      document.getElementById('lifetime-value-multiplier').value = 1;
+                      document.getElementById('profit-margin').value = 50;
+                      document.getElementById('time-period').value = 12;
+
+                      // Set placeholders
+                      document.getElementById('keywords').placeholder = "e.g., 15";
+                      document.getElementById('avg-monthly-sv').placeholder = "e.g., 500";
+                      document.getElementById('avg-order-value').placeholder = "e.g., 100";
+                      document.getElementById('seo-investment').placeholder = "e.g., 2500";
+                  });
+
+                  // Toggle Advanced Options
+                  document.querySelector('.toggle-advanced').addEventListener('click', function(e) {
+                      e.preventDefault(); // Prevent default behavior
+                      const advancedInputs = document.querySelector('.advanced-inputs');
+                      advancedInputs.classList.toggle('show');
+
+                      if (advancedInputs.classList.contains('show')) {
+                          this.textContent = '- Hide Advanced Options';
+                      } else {
+                          this.textContent = '+ Show Advanced Options';
+                      }
+                  });
+
+                  // Tab Switching
+                  const tabs = document.querySelectorAll('.tab');
+                  tabs.forEach(tab => {
+                      tab.addEventListener('click', function() {
+                          // Remove active class from all tabs
+                          tabs.forEach(t => t.classList.remove('active'));
+                          // Add active class to clicked tab
+                          this.classList.add('active');
+
+                          // Hide all tab contents
+                          const tabContents = document.querySelectorAll('.tab-content');
+                          tabContents.forEach(content => {
+                              content.classList.remove('active');
+                          });
+
+                          // Show the corresponding tab content
+                          const tabContent = document.querySelector(`.tab-content[data-tab-content="${this.dataset.tab}"]`);
+                          if (tabContent) {
+                              tabContent.classList.add('active');
+                          }
+                      });
+                  });
+
+                  // Form Submission
+                  document.getElementById('roi-calculator-form').addEventListener('submit', function(e) {
+                      e.preventDefault();
+                      calculateROI();
+                  });
+
+                  document.getElementById('advanced-calculator-form').addEventListener('submit', function(e) {
+                      e.preventDefault();
+                      calculateAdvancedROI();
+                  });
+
+                  // ROI Calculation Function
+                  function calculateROI() {
+                      // Get input values
+                      const keywords = parseFloat(document.getElementById('keywords').value) || 0;
+                      const avgMonthlySV = parseFloat(document.getElementById('avg-monthly-sv').value) || 0;
+                      const ctr = parseFloat(document.getElementById('click-through-rate').value) || 0;
+                      const conversionRate = parseFloat(document.getElementById('conversion-rate').value) || 0;
+                      const avgOrderValue = parseFloat(document.getElementById('avg-order-value').value) || 0;
+                      const seoInvestment = parseFloat(document.getElementById('seo-investment').value) || 0;
+
+                      // Get advanced input values
+                      const lifetimeValueMultiplier = parseFloat(document.getElementById('lifetime-value-multiplier').value) || 1;
+                      const profitMargin = parseFloat(document.getElementById('profit-margin').value) || 50;
+                      const timePeriod = parseFloat(document.getElementById('time-period').value) || 12;
+
+                      // Calculate results
+                      const monthlyTraffic = keywords * avgMonthlySV * (ctr / 100);
+                      const monthlyConversions = monthlyTraffic * (conversionRate / 100);
+                      const monthlyRevenue = monthlyConversions * avgOrderValue * lifetimeValueMultiplier;
+                      const monthlyProfit = monthlyRevenue * (profitMargin / 100);
+                      const monthlyROI = seoInvestment > 0 ? ((monthlyProfit - seoInvestment) / seoInvestment) * 100 : 0;
+                      const annualROI = seoInvestment > 0 ? ((monthlyProfit * timePeriod - seoInvestment * timePeriod) / (seoInvestment * timePeriod)) * 100 : 0;
+                      const dollarReturn = seoInvestment > 0 ? monthlyProfit / seoInvestment : 0;
+
+                      const annualRevenue = monthlyRevenue * timePeriod;
+                      const annualProfit = monthlyProfit * timePeriod;
+                      const annualInvestment = seoInvestment * timePeriod;
+                      const netProfit = annualProfit - annualInvestment;
+
+                      // Calculate break-even point (in months)
+                      const breakevenPoint = monthlyProfit > 0 ? seoInvestment / monthlyProfit : Infinity;
+
+                      // Update results
+                      document.getElementById('monthly-traffic').textContent = Math.round(monthlyTraffic).toLocaleString();
+                      document.getElementById('monthly-conversions').textContent = monthlyConversions.toFixed(1);
+                      document.getElementById('monthly-revenue').textContent = '$' + monthlyRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                      document.getElementById('monthly-cost').textContent = '$' + seoInvestment.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                      document.getElementById('monthly-roi').textContent = monthlyROI.toFixed(2) + '%';
+                      document.getElementById('annual-roi').textContent = annualROI.toFixed(2) + '%';
+                      document.getElementById('dollar-return').textContent = '$' + dollarReturn.toFixed(2);
+
+                      document.getElementById('breakeven-point').textContent = isFinite(breakevenPoint) ? breakevenPoint.toFixed(1) + ' months' : 'N/A';
+                      document.getElementById('annual-revenue').textContent = '$' + annualRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                      document.getElementById('annual-profit').textContent = '$' + annualProfit.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                      document.getElementById('annual-investment').textContent = '$' + annualInvestment.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                      document.getElementById('net-profit').textContent = '$' + netProfit.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                      // Generate recommendations
+                      generateRecommendations(monthlyROI, breakevenPoint, conversionRate, ctr, keywords, avgMonthlySV);
+
+                      // Create chart
+                      createROIChart(timePeriod, seoInvestment, monthlyProfit);
+
+                      // Show results
+                      document.getElementById('results').classList.add('show');
+
+                      // Scroll to results
+                      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                  }
+
+                  // Generate Recommendations based on results
+                  function generateRecommendations(monthlyROI, breakevenPoint, conversionRate, ctr, keywords, avgMonthlySV) {
+                      const recommendationsElement = document.getElementById('recommendations');
+                      let recommendations = '';
+
+                      // ROI-based recommendations
+                      if (monthlyROI < 0) {
+                          recommendations += `<p><strong>Your current SEO ROI is negative.</strong> Here are some ways to improve:</p>
+                          <ul>
+                              <li>Focus on higher-converting keywords that align with your business goals</li>
+                              <li>Improve your website's conversion rate with better landing pages
+                              <li>Improve your website's conversion rate with better landing pages and user experience</li>
+                                                  <li>Reduce SEO costs by focusing on the most effective strategies</li>
+                                                  <li>Consider increasing your average order value through upselling or cross-selling</li>
+                                              </ul>`;
+                                          } else if (monthlyROI < 50) {
+                                              recommendations += `<p><strong>Your SEO ROI is positive but could be improved.</strong> Consider these strategies:</p>
+                                              <ul>
+                                                  <li>Target more high-intent keywords to attract users closer to making a purchase</li>
+                                                  <li>Optimize your highest-traffic pages for better conversion rates</li>
+                                                  <li>Implement A/B testing to identify what drives better results</li>
+                                              </ul>`;
+                                          } else {
+                                              recommendations += `<p><strong>Your SEO ROI is strong!</strong> To maintain and improve:</p>
+                                              <ul>
+                                                  <li>Continue expanding your keyword targeting to capture more market share</li>
+                                                  <li>Reinvest some of your profits into scaling successful SEO strategies</li>
+                                                  <li>Consider diversifying your traffic sources while maintaining your SEO advantage</li>
+                                              </ul>`;
+                                          }
+
+                                          // Break-even point recommendations
+                                          if (isFinite(breakevenPoint)) {
+                                              if (breakevenPoint > 12) {
+                                                  recommendations += `<p><strong>Your break-even point is longer than 12 months.</strong> To speed up your ROI:</p>
+                                                  <ul>
+                                                      <li>Focus on quick-win keywords that can rank faster</li>
+                                                      <li>Optimize existing content that's already getting some traffic</li>
+                                                      <li>Consider adjusting your SEO budget allocation for better efficiency</li>
+                                                  </ul>`;
+                                              } else if (breakevenPoint > 6) {
+                                                  recommendations += `<p><strong>Your break-even point is between 6-12 months,</strong> which is typical for SEO campaigns. Keep optimizing to improve this timeline.</p>`;
+                                              } else {
+                                                  recommendations += `<p><strong>Your break-even point is less than 6 months,</strong> which is excellent for an SEO campaign!</p>`;
+                                              }
+                                          }
+
+                                          // Conversion rate recommendations
+                                          if (conversionRate < 1) {
+                                              recommendations += `<p><strong>Your conversion rate is below average.</strong> Focus on conversion rate optimization (CRO):</p>
+                                              <ul>
+                                                  <li>Improve your call-to-action buttons and placement</li>
+                                                  <li>Streamline your checkout or lead capture process</li>
+                                                  <li>Add social proof and testimonials to build trust</li>
+                                                  <li>Ensure your site is mobile-friendly and loads quickly</li>
+                                              </ul>`;
+                                          }
+
+                                          // CTR recommendations
+                                          if (ctr < 2) {
+                                              recommendations += `<p><strong>Your click-through rate is low.</strong> To improve:</p>
+                                              <ul>
+                                                  <li>Optimize your meta titles and descriptions to be more compelling</li>
+                                                  <li>Use schema markup to enhance your search results appearance</li>
+                                                  <li>Target featured snippets to increase visibility</li>
+                                                  <li>Improve your brand recognition to encourage more clicks</li>
+                                              </ul>`;
+                                          }
+
+                                          // Keyword recommendations
+                                          if (keywords < 5) {
+                                              recommendations += `<p><strong>You're targeting relatively few keywords.</strong> Consider:</p>
+                                              <ul>
+                                                  <li>Expanding your content strategy to cover more relevant topics</li>
+                                                  <li>Creating topic clusters around your main keywords</li>
+                                                  <li>Targeting long-tail variations of your primary keywords</li>
+                                              </ul>`;
+                                          }
+
+                                          recommendationsElement.innerHTML = recommendations;
+                                      }
+
+                                      // Create ROI Chart
+                                      function createROIChart(timePeriod, monthlyCost, monthlyProfit) {
+                                          const chartElement = document.getElementById('roi-chart');
+
+                                          // Clear any existing chart
+                                          chartElement.innerHTML = '';
+                                          const canvas = document.createElement('canvas');
+                                          chartElement.appendChild(canvas);
+
+                                          // Generate data for the chart
+                                          const labels = [];
+                                          const investmentData = [];
+                                          const profitData = [];
+                                          const cumulativeROIData = [];
+
+                                          let cumulativeInvestment = 0;
+                                          let cumulativeProfit = 0;
+
+                                          for (let i = 1; i <= timePeriod; i++) {
+                                              labels.push(`Month ${i}`);
+
+                                              cumulativeInvestment += monthlyCost;
+                                              investmentData.push(cumulativeInvestment);
+
+                                              cumulativeProfit += monthlyProfit;
+                                              profitData.push(cumulativeProfit);
+
+                                              const monthlyROI = cumulativeInvestment > 0 ? (cumulativeProfit - cumulativeInvestment) / cumulativeInvestment * 100 : 0;
+                                              cumulativeROIData.push(monthlyROI);
+                                          }
+
+                                          // Create the chart
+                                          new Chart(canvas, {
+                                              type: 'bar',
+                                              data: {
+                                                  labels: labels,
+                                                  datasets: [
+                                                      {
+                                                          label: 'Cumulative Investment ($)',
+                                                          data: investmentData,
+                                                          backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                                          borderColor: 'rgb(255, 99, 132)',
+                                                          borderWidth: 1,
+                                                          order: 2
+                                                      },
+                                                      {
+                                                          label: 'Cumulative Profit ($)',
+                                                          data: profitData,
+                                                          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                                                          borderColor: 'rgb(75, 192, 192)',
+                                                          borderWidth: 1,
+                                                          order: 1
+                                                      },
+                                                      {
+                                                          label: 'Cumulative ROI (%)',
+                                                          data: cumulativeROIData,
+                                                          type: 'line',
+                                                          borderColor: '#0093fe',
+                                                          backgroundColor: 'rgba(0, 147, 254, 0.1)',
+                                                          borderWidth: 2,
+                                                          fill: true,
+                                                          yAxisID: 'y1',
+                                                          order: 0
+                                                      }
+                                                  ]
+                                              },
+                                              options: {
+                                                  responsive: true,
+                                                  maintainAspectRatio: false,
+                                                  scales: {
+                                                      y: {
+                                                          title: {
+                                                              display: true,
+                                                              text: 'Amount ($)'
+                                                          },
+                                                          beginAtZero: true
+                                                      },
+                                                      y1: {
+                                                          position: 'right',
+                                                          title: {
+                                                              display: true,
+                                                              text: 'ROI (%)'
+                                                          },
+                                                          beginAtZero: true,
+                                                          grid: {
+                                                              drawOnChartArea: false
+                                                          }
+                                                      }
+                                                  },
+                                                  plugins: {
+                                                      tooltip: {
+                                                          callbacks: {
+                                                              label: function(context) {
+                                                                  let label = context.dataset.label || '';
+                                                                  if (label) {
+                                                                      label += ': ';
+                                                                  }
+
+                                                                  if (context.datasetIndex === 2) {
+                                                                      label += context.raw.toFixed(2) + '%';
+                                                                  } else {
+                                                                      label += '$' + context.raw.toFixed(2);
+                                                                  }
+
+                                                                  return label;
+                                                              }
+                                                          }
+                                                      },
+                                                      legend: {
+                                                          position: 'top'
+                                                      },
+                                                      title: {
+                                                          display: true,
+                                                          text: 'SEO Investment vs. Profit Over Time'
+                                                      }
+                                                  }
+                                              }
+                                          });
+                                      }
+
+                                      // Advanced ROI Calculation Function
+                                      function calculateAdvancedROI() {
+                                          // Get values from advanced form
+                                          const seoGoal = document.getElementById('seo-campaign-goal').value;
+                                          const currentRankings = document.getElementById('current-rankings').value;
+                                          const competitionLevel = document.getElementById('competition-level').value;
+
+                                          // Get investment breakdown
+                                          const contentInvestment = parseFloat(document.getElementById('content-investment').value) || 0;
+                                          const linkBuildingInvestment = parseFloat(document.getElementById('link-building-investment').value) || 0;
+                                          const technicalSEOInvestment = parseFloat(document.getElementById('technical-seo-investment').value) || 0;
+                                          const localSEOInvestment = parseFloat(document.getElementById('local-seo-investment').value) || 0;
+                                          const toolsInvestment = parseFloat(document.getElementById('tools-investment').value) || 0;
+
+                                          const totalInvestment = contentInvestment + linkBuildingInvestment + technicalSEOInvestment + localSEOInvestment + toolsInvestment;
+
+                                          // Set default values based on selections
+                                          let defaultKeywords = 10;
+                                          let defaultSearchVolume = 500;
+                                          let defaultCTR = 3.5;
+                                          let defaultConversionRate = 2.5;
+
+                                          // Adjust based on competition level
+                                          if (competitionLevel === 'high') {
+                                              defaultCTR -= 1;
+                                              defaultKeywords -= 3;
+                                          } else if (competitionLevel === 'low') {
+                                              defaultCTR += 1;
+                                              defaultKeywords += 5;
+                                          }
+
+                                          // Adjust based on current rankings
+                                          if (currentRankings === 'new') {
+                                              defaultKeywords = Math.max(5, defaultKeywords - 5);
+                                          } else if (currentRankings === 'high') {
+                                              defaultKeywords += 10;
+                                              defaultCTR += 1;
+                                          }
+
+                                          // Adjust based on goal
+                                          if (seoGoal === 'leads') {
+                                              defaultConversionRate = 3.5;
+                                          } else if (seoGoal === 'brand') {
+                                              defaultConversionRate = 1.0;
+                                          } else if (seoGoal === 'traffic') {
+                                              defaultCTR += 2;
+                                              defaultConversionRate = 1.5;
+                                          }
+
+                                          // Set values in the basic calculator
+                                          if (!document.getElementById('keywords').value) {
+                                              document.getElementById('keywords').value = defaultKeywords;
+                                          }
+
+                                          if (!document.getElementById('avg-monthly-sv').value) {
+                                              document.getElementById('avg-monthly-sv').value = defaultSearchVolume;
+                                          }
+
+                                          document.getElementById('click-through-rate').value = defaultCTR;
+                                          document.getElementById('conversion-rate').value = defaultConversionRate;
+                                          document.getElementById('seo-investment').value = totalInvestment;
+
+                                          // Switch to basic tab
+                                          document.querySelector('.tab[data-tab="basic"]').click();
+
+                                          // Calculate ROI using basic function
+                                          calculateROI();
+                                      }
+
+                                      // Form validation
+                                      function validateForm() {
+                                          const requiredFields = document.querySelectorAll('[required]');
+                                          let isValid = true;
+
+                                          requiredFields.forEach(field => {
+                                              if (!field.value.trim()) {
+                                                  field.classList.add('error');
+                                                  isValid = false;
+                                              } else {
+                                                  field.classList.remove('error');
+                                              }
+                                          });
+
+                                          return isValid;
+                                      }
+                                  </script>
+                              </body>
+                              </html>
