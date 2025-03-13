@@ -1,6 +1,10 @@
-import { CalculatorInputs, AdvancedCalculatorInputs } from '../types/calculator';
+import { CalculatorInputs, AdvancedCalculatorInputs, CompetitionLevel } from '../types/calculator';
 import { CalculationResults, ChartDataPoint, RecommendationItem } from '../types/results';
 
+/**
+ * Calculate Return on Investment (ROI) for SEO efforts using enhanced calculation models
+ * Updated with S-curve growth modeling, discounted cash flow, and conversion rate maturation
+ */
 export const calculateROI = (inputs: CalculatorInputs): CalculationResults => {
   const {
     keywords,
@@ -14,33 +18,136 @@ export const calculateROI = (inputs: CalculatorInputs): CalculationResults => {
     timePeriod
   } = inputs;
 
-  // Calculate results
-  const monthlyTraffic = keywords * avgMonthlySV * (clickThroughRate / 100);
-  const monthlyConversions = monthlyTraffic * (conversionRate / 100);
-  const monthlyRevenue = monthlyConversions * avgOrderValue * lifetimeValueMultiplier;
-  const monthlyProfit = monthlyRevenue * (profitMargin / 100);
-  const monthlyROI = seoInvestment > 0 ? ((monthlyProfit - seoInvestment) / seoInvestment) * 100 : 0;
-  const annualROI = seoInvestment > 0 ? ((monthlyProfit * timePeriod - seoInvestment * timePeriod) / (seoInvestment * timePeriod)) * 100 : 0;
-  const dollarReturn = seoInvestment > 0 ? monthlyProfit / seoInvestment : 0;
+  // S-curve traffic growth modeling instead of linear growth
+  // Calculate base traffic with ranking position factor
+  const baseMonthlyTraffic = keywords * avgMonthlySV * (clickThroughRate / 100);
+  
+  // Calculate traffic with diminishing returns on investment
+  // Uses logarithmic growth: TrafficGain = a * ln(investment + 1) * keywordFactor
+  const investmentFactor = Math.log(seoInvestment + 1) * 0.1;
+  const keywordFactor = Math.min(keywords / 10, 5); // Cap influence at 5x
+  const trafficMultiplier = 1 + (investmentFactor * keywordFactor);
+  const monthlyTraffic = baseMonthlyTraffic * trafficMultiplier;
 
+  // Time-based conversion rate maturation
+  // CR(t) = BaselineCR * (1 + maturationFactor * (1 - e^-t/τ))
+  const maturationFactor = 0.2; // 20% increase at full maturity
+  const timeConstant = 3; // Time constant in months
+  const maturedConversionRate = conversionRate * (1 + maturationFactor * (1 - Math.exp(-timePeriod / timeConstant)));
+  
+  // Adjust for keyword difficulty based on formula
+  // Use a default medium competition level if not specified
+  const competitionLevel: CompetitionLevel = 
+    (inputs as any).competitionLevel || 'medium';
+  const assumedKeywordDifficulty = competitionLevel === 'high' ? 70 : 
+                                   competitionLevel === 'medium' ? 50 : 30;
+  const keywordDifficultyAdjustment = 1 - (Math.pow(assumedKeywordDifficulty, 2) / 10000);
+  
+  // Calculate monthly metrics with enhanced models
+  const adjustedTraffic = monthlyTraffic * keywordDifficultyAdjustment;
+  const monthlyConversions = adjustedTraffic * (maturedConversionRate / 100);
+  
+  // Implement industry-specific calculations based on inputs
+  let industryValueMultiplier = 1;
+  
+  // Access optional advanced properties safely
+  const advancedInputs = inputs as any;
+  if (advancedInputs.seoGoal === 'leads') {
+    // B2B sales cycle adjustment - delay factor
+    const leadTime = 3; // Average months to convert lead
+    industryValueMultiplier = timePeriod > leadTime ? (timePeriod - leadTime) / timePeriod : 0.5;
+  } else if (inputs.advancedOptionsVisible && 
+            advancedInputs.contentInvestment > advancedInputs.linkBuildingInvestment) {
+    // Content-heavy strategy typically increases LTV
+    industryValueMultiplier = 1.15;
+  }
+  
+  // Calculate revenue incorporating lifetime value
+  const monthlyRevenue = monthlyConversions * avgOrderValue * lifetimeValueMultiplier * industryValueMultiplier;
+  const monthlyProfit = monthlyRevenue * (profitMargin / 100);
+  
+  // Implement discounted cash flow for more accurate ROI
+  // NPV = Σ[(Revenue - Cost)t / (1 + r)^t]
+  const discountRate = 0.06 / 12; // Monthly discount rate (6% annual)
+  let discountedProfit = 0;
+  let discountedCost = 0;
+  
+  for (let t = 1; t <= timePeriod; t++) {
+    // Apply ramp-up period logic for more realistic growth
+    // EffectiveValue(t) = ProjectedValue * (1 - e^(-t/rampUpPeriod))
+    const rampUpPeriod = 3; // Months to reach significant results
+    const rampUpFactor = 1 - Math.exp(-t / rampUpPeriod);
+    
+    // Apply S-curve growth model
+    // Traffic(t) = MaxTraffic / (1 + e^-k(t-t0))
+    const growthRate = 0.3; // Growth rate parameter
+    const midpoint = timePeriod / 2; // Midpoint of growth curve
+    const sCurveFactor = 1 / (1 + Math.exp(-growthRate * (t - midpoint)));
+    
+    // Monthly profit applying growth factors
+    const monthProfitAtTimeT = monthlyProfit * rampUpFactor * sCurveFactor;
+    
+    // Apply discounting
+    discountedProfit += monthProfitAtTimeT / Math.pow(1 + discountRate, t);
+    discountedCost += seoInvestment / Math.pow(1 + discountRate, t);
+  }
+  
+  // Calculate ROI metrics using discounted values
+  const discountedNetProfit = discountedProfit - discountedCost;
+  const monthlyROI = discountedCost > 0 ? (discountedNetProfit / discountedCost) * 100 : 0;
+  
+  // Apply opportunity cost factor
+  const assumedAlternativeReturn = 5; // 5% annual return on alternative investment
+  const adjustedROI = monthlyROI - (assumedAlternativeReturn / 12);
+  
+  // Calculate annual metrics considering compounding effects
+  const retentionFactor = 0.9; // 90% retention of results month-to-month
+  const compoundedAnnualProfit = monthlyProfit * 
+    (Math.pow(1 + 0.02, timePeriod) - 1) / 0.02 * retentionFactor;
+  
+  const annualROI = discountedCost > 0 ? 
+    ((compoundedAnnualProfit - discountedCost) / discountedCost) * 100 : 0;
+  
+  const dollarReturn = discountedCost > 0 ? compoundedAnnualProfit / discountedCost : 0;
+  
+  // Time-to-value model with breakeven probability function
+  // BreakevenProbability(t) = 1 - e^(-λt)
+  const lambda = 0.1; // Rate parameter
+  let breakEvenPoint = Infinity;
+  
+  // Find the month where cumulative profit exceeds investment
+  let cumulativeProfit = 0;
+  for (let t = 1; t <= 36; t++) { // Check up to 36 months
+    // Apply ramp-up factor
+    const rampUpFactor = 1 - Math.exp(-t / 3);
+    cumulativeProfit += monthlyProfit * rampUpFactor;
+    
+    if (cumulativeProfit >= seoInvestment && breakEvenPoint === Infinity) {
+      breakEvenPoint = t;
+      break;
+    }
+  }
+  
+  // Calculate expected breakeven with probability adjustment
+  const breakEvenProbability = 1 - Math.exp(-lambda * breakEvenPoint);
+  const adjustedBreakEven = breakEvenPoint / breakEvenProbability;
+  
+  // Final calculations
   const annualRevenue = monthlyRevenue * timePeriod;
-  const annualProfit = monthlyProfit * timePeriod;
+  const annualProfit = compoundedAnnualProfit;
   const annualInvestment = seoInvestment * timePeriod;
   const netProfit = annualProfit - annualInvestment;
 
-  // Calculate break-even point (in months)
-  const breakEvenPoint = monthlyProfit > 0 ? seoInvestment / monthlyProfit : Infinity;
-
   return {
-    monthlyTraffic,
+    monthlyTraffic: adjustedTraffic,
     monthlyConversions,
     monthlyRevenue,
     monthlyCost: seoInvestment,
     monthlyProfit,
-    monthlyROI,
+    monthlyROI: adjustedROI, // Adjusted ROI with opportunity cost
     annualROI,
     dollarReturn,
-    breakEvenPoint,
+    breakEvenPoint: Math.round(adjustedBreakEven * 10) / 10, // Round to 1 decimal
     annualRevenue,
     annualProfit,
     annualInvestment,
@@ -48,6 +155,10 @@ export const calculateROI = (inputs: CalculatorInputs): CalculationResults => {
   };
 };
 
+/**
+ * Calculates advanced ROI based on industry-specific factors and competition levels
+ * Enhanced with more sophisticated adjustments for various industry types
+ */
 export const calculateAdvancedROI = (
   basicInputs: CalculatorInputs,
   advancedInputs: AdvancedCalculatorInputs
@@ -68,48 +179,89 @@ export const calculateAdvancedROI = (
 
   // Set default values based on selections
   let defaultKeywords = 10;
-  const defaultSearchVolume = 500;
+  let defaultSearchVolume = 500; // Changed from const to let
   let defaultCTR = 3.5;
   let defaultConversionRate = 2.5;
 
-  // Adjust based on competition level
+  // Enhanced competition level adjustments
   if (competitionLevel === 'high') {
-    defaultCTR -= 1;
-    defaultKeywords -= 3;
+    defaultCTR = Math.max(defaultCTR * 0.7, 1.5); // Multiply instead of flat reduction
+    defaultKeywords = Math.max(defaultKeywords - 3, 3);
   } else if (competitionLevel === 'low') {
-    defaultCTR += 1;
-    defaultKeywords += 5;
+    defaultCTR = defaultCTR * 1.3; // Multiply for proportional increase
+    defaultKeywords = defaultKeywords * 1.5; // 50% more keywords in low competition
   }
 
-  // Adjust based on current rankings
+  // More sophisticated ranking adjustments
   if (currentRankings === 'new') {
     defaultKeywords = Math.max(5, defaultKeywords - 5);
+    defaultCTR = defaultCTR * 0.8; // Lower CTR for new sites
   } else if (currentRankings === 'high') {
-    defaultKeywords += 10;
-    defaultCTR += 1;
+    defaultKeywords = defaultKeywords * 2; // Double keywords for high-ranking sites
+    defaultCTR = defaultCTR * 1.4; // 40% higher CTR for high-ranking sites
   }
 
-  // Adjust based on goal
+  // Enhanced goal-based adjustments
+  let ltv = basicInputs.lifetimeValueMultiplier || 1;
   if (seoGoal === 'leads') {
     defaultConversionRate = 3.5;
+    ltv = 1.5; // Higher LTV for lead generation
   } else if (seoGoal === 'brand') {
     defaultConversionRate = 1.0;
+    ltv = 2.0; // Brand awareness leads to higher LTV
   } else if (seoGoal === 'traffic') {
     defaultCTR += 2;
     defaultConversionRate = 1.5;
   }
 
-  // Create a new inputs object with updated values
-  return {
+  // Apply industry-specific adjustments
+  let profitMargin = basicInputs.profitMargin || 50;
+  let averageOrderValue = basicInputs.avgOrderValue || 0;
+  
+  // B2B sales cycle adjustments
+  if (seoGoal === 'leads' && averageOrderValue > 500) {
+    // Higher AOV indicates B2B, which typically has higher margins
+    profitMargin = Math.min(profitMargin * 1.2, 80);
+  }
+  
+  // E-commerce formula refinements
+  if (seoGoal === 'sales' && contentInvestment > linkBuildingInvestment) {
+    // Content-focused e-commerce tends to have better retention
+    const assumedRepeatPurchaseRate = 0.3;
+    const assumedRetentionRate = 0.7;
+    ltv = 1 + (assumedRepeatPurchaseRate / (1 - assumedRetentionRate));
+  }
+  
+  // Local business radius calculation for local SEO
+  if (localSEOInvestment > 0) {
+    // Adjust keywords based on local focus
+    const localSearchMultiplier = 0.8; // Local searches are typically less volume but higher intent
+    defaultSearchVolume = defaultSearchVolume * localSearchMultiplier;
+    defaultConversionRate = defaultConversionRate * 1.3; // Local intent typically converts better
+  }
+
+  // Create a new inputs object with updated values and advanced improvements
+  const result: CalculatorInputs = {
     ...basicInputs,
     keywords: basicInputs.keywords || defaultKeywords,
     avgMonthlySV: basicInputs.avgMonthlySV || defaultSearchVolume,
     clickThroughRate: defaultCTR,
     conversionRate: defaultConversionRate,
-    seoInvestment: totalInvestment
+    lifetimeValueMultiplier: ltv,
+    profitMargin: profitMargin,
+    seoInvestment: totalInvestment,
   };
+  
+  // Add competitionLevel to the result object for use in calculations
+  (result as any).competitionLevel = competitionLevel;
+  
+  return result;
 };
 
+/**
+ * Generates chart data for ROI visualization
+ * Enhanced with S-curve growth models and ramp-up periods
+ */
 export const generateChartData = (
   timePeriod: number,
   monthlyCost: number,
@@ -119,10 +271,26 @@ export const generateChartData = (
 
   let cumulativeInvestment = 0;
   let cumulativeProfit = 0;
+  
+  // Growth curve parameters
+  const growthRate = 0.3; // Growth rate parameter 
+  const midpoint = timePeriod / 2; // Midpoint of growth curve
+  const rampUpPeriod = 3; // Months to reach significant results
 
   for (let i = 1; i <= timePeriod; i++) {
     cumulativeInvestment += monthlyCost;
-    cumulativeProfit += monthlyProfit;
+    
+    // Apply S-curve growth model
+    // Traffic(t) = MaxTraffic / (1 + e^-k(t-t0))
+    const sCurveFactor = 1 / (1 + Math.exp(-growthRate * (i - midpoint)));
+    
+    // Apply ramp-up period logic
+    // EffectiveValue(t) = ProjectedValue * (1 - e^(-t/rampUpPeriod))
+    const rampUpFactor = 1 - Math.exp(-i / rampUpPeriod);
+    
+    // Calculate profit with growth factors
+    const profitForMonth = monthlyProfit * rampUpFactor * sCurveFactor;
+    cumulativeProfit += profitForMonth;
 
     const monthlyROI = cumulativeInvestment > 0 
       ? (cumulativeProfit - cumulativeInvestment) / cumulativeInvestment * 100 
@@ -139,6 +307,10 @@ export const generateChartData = (
   return chartData;
 };
 
+/**
+ * Generates tailored recommendations based on calculated ROI and metrics
+ * Enhanced with more sophisticated industry-specific recommendations
+ */
 export const generateRecommendations = (
   monthlyROI: number,
   breakEvenPoint: number,
@@ -148,7 +320,7 @@ export const generateRecommendations = (
 ): RecommendationItem[] => {
   const recommendations: RecommendationItem[] = [];
 
-  // ROI-based recommendations
+  // Enhanced ROI-based recommendations
   if (monthlyROI < 0) {
     recommendations.push({
       title: 'Your current SEO ROI is negative.',
@@ -157,7 +329,8 @@ export const generateRecommendations = (
         'Focus on higher-converting keywords that align with your business goals',
         'Improve your website\'s conversion rate with better landing pages and user experience',
         'Reduce SEO costs by focusing on the most effective strategies',
-        'Consider increasing your average order value through upselling or cross-selling'
+        'Consider increasing your average order value through upselling or cross-selling',
+        'Target keywords with lower difficulty to see faster results'
       ]
     });
   } else if (monthlyROI < 50) {
@@ -167,7 +340,9 @@ export const generateRecommendations = (
       items: [
         'Target more high-intent keywords to attract users closer to making a purchase',
         'Optimize your highest-traffic pages for better conversion rates',
-        'Implement A/B testing to identify what drives better results'
+        'Implement A/B testing to identify what drives better results',
+        'Focus on content that addresses the full customer journey',
+        'Improve your internal linking structure to boost overall site authority'
       ]
     });
   } else {
@@ -177,12 +352,14 @@ export const generateRecommendations = (
       items: [
         'Continue expanding your keyword targeting to capture more market share',
         'Reinvest some of your profits into scaling successful SEO strategies',
-        'Consider diversifying your traffic sources while maintaining your SEO advantage'
+        'Consider diversifying your traffic sources while maintaining your SEO advantage',
+        'Create content clusters around your most profitable topics',
+        'Implement advanced structured data to enhance SERP visibility'
       ]
     });
   }
 
-  // Break-even point recommendations
+  // Enhanced breakeven recommendations using probability model
   if (isFinite(breakEvenPoint)) {
     if (breakEvenPoint > 12) {
       recommendations.push({
@@ -191,25 +368,35 @@ export const generateRecommendations = (
         items: [
           'Focus on quick-win keywords that can rank faster',
           'Optimize existing content that\'s already getting some traffic',
-          'Consider adjusting your SEO budget allocation for better efficiency'
+          'Consider adjusting your SEO budget allocation for better efficiency',
+          'Target higher-converting, lower-volume keywords initially',
+          'Implement conversion rate optimization tactics alongside SEO'
         ]
       });
     } else if (breakEvenPoint > 6) {
       recommendations.push({
         title: 'Your break-even point is between 6-12 months,',
         description: 'which is typical for SEO campaigns. Keep optimizing to improve this timeline.',
-        items: []
+        items: [
+          'Continue your current strategy while monitoring performance',
+          'Look for opportunities to accelerate results through featured snippets',
+          'Consider adding complementary marketing channels to boost overall ROI'
+        ]
       });
     } else {
       recommendations.push({
         title: 'Your break-even point is less than 6 months,',
         description: 'which is excellent for an SEO campaign!',
-        items: []
+        items: [
+          'Document your successful strategies for future campaigns',
+          'Consider increasing investment to scale these results',
+          'Look for ways to expand to related keyword areas'
+        ]
       });
     }
   }
 
-  // Conversion rate recommendations
+  // Enhanced conversion rate recommendations with segmentation
   if (conversionRate < 1) {
     recommendations.push({
       title: 'Your conversion rate is below average.',
@@ -218,12 +405,14 @@ export const generateRecommendations = (
         'Improve your call-to-action buttons and placement',
         'Streamline your checkout or lead capture process',
         'Add social proof and testimonials to build trust',
-        'Ensure your site is mobile-friendly and loads quickly'
+        'Ensure your site is mobile-friendly and loads quickly',
+        'Segment your traffic and create targeted landing pages for different user intents',
+        'Implement personalization based on user behavior and traffic source'
       ]
     });
   }
 
-  // CTR recommendations
+  // Enhanced CTR recommendations with ranking analysis
   if (ctr < 2) {
     recommendations.push({
       title: 'Your click-through rate is low.',
@@ -232,12 +421,14 @@ export const generateRecommendations = (
         'Optimize your meta titles and descriptions to be more compelling',
         'Use schema markup to enhance your search results appearance',
         'Target featured snippets to increase visibility',
-        'Improve your brand recognition to encourage more clicks'
+        'Improve your brand recognition to encourage more clicks',
+        'Research high-performing titles in your niche and adapt their patterns',
+        'Use emotional triggers and power words in your meta descriptions'
       ]
     });
   }
 
-  // Keyword recommendations
+  // Enhanced keyword strategy recommendations
   if (keywords < 5) {
     recommendations.push({
       title: 'You\'re targeting relatively few keywords.',
@@ -245,7 +436,10 @@ export const generateRecommendations = (
       items: [
         'Expanding your content strategy to cover more relevant topics',
         'Creating topic clusters around your main keywords',
-        'Targeting long-tail variations of your primary keywords'
+        'Targeting long-tail variations of your primary keywords',
+        'Analyzing competitor keyword gaps to find new opportunities',
+        'Using question-based keywords to capture featured snippets',
+        'Implementing a content calendar to gradually expand your keyword coverage'
       ]
     });
   }
