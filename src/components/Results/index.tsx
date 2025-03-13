@@ -7,7 +7,11 @@ import ResultItem from './ResultItem';
 import Tooltip from '../Form/Tooltip';
 import { FiInfo } from 'react-icons/fi';
 
-// this is a change
+// Helper function to format numbers with commas and round to whole numbers
+const formatNumber = (value: number): string => {
+  // Round up to integer and format with commas
+  return Math.ceil(value).toLocaleString('en-US');
+};
 
 interface ResultsProps {
   results: CalculationResults;
@@ -38,33 +42,33 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
       <ResultsGrid>
         <ResultItem 
           title="Initial Monthly Revenue"
-          value={initialRevenue.toFixed(2)}
+          value={formatNumber(initialRevenue)}
           prefix="$"
         />
         
         <ResultItem 
           title="Projected Monthly Revenue"
-          value={projectedRevenue.toFixed(2)}
+          value={formatNumber(projectedRevenue)}
           prefix="$"
           isPositive={projectedRevenue > initialRevenue}
         />
         
         <ResultItem 
           title="Monthly Revenue Increase"
-          value={revenueIncrease.toFixed(2)}
+          value={formatNumber(revenueIncrease)}
           prefix="$"
           isPositive={revenueIncrease > 0}
         />
         
         <ResultItem 
           title="Total SEO Investment"
-          value={totalSEOCost.toFixed(2)}
+          value={formatNumber(totalSEOCost)}
           prefix="$"
         />
         
         <ResultItem 
           title="Return on Investment"
-          value={roi.toFixed(2)}
+          value={formatNumber(roi)}
           suffix="%"
           highlight={true}
           isPositive={roi > 0}

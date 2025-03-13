@@ -30,6 +30,12 @@ ChartJS.register(
   Legend
 );
 
+// Helper function to format numbers with commas and round to whole numbers
+const formatNumber = (value: number): string => {
+  // Round up to integer and format with commas
+  return Math.ceil(value).toLocaleString('en-US');
+};
+
 interface ChartComponentProps {
   data: ChartData;
 }
@@ -61,8 +67,11 @@ const ChartComponent: React.FC<ChartComponentProps> = ({ data }) => {
         ticks: {
           // Use proper type signature for callback function
           callback: function(tickValue: number | string) {
-            // Only apply Math.ceil to numeric values
-            return typeof tickValue === 'number' ? Math.ceil(tickValue) : tickValue;
+            // Only apply Math.ceil to numeric values and add commas
+            if (typeof tickValue === 'number') {
+              return formatNumber(tickValue);
+            }
+            return tickValue;
           }
         }
       },
@@ -76,8 +85,11 @@ const ChartComponent: React.FC<ChartComponentProps> = ({ data }) => {
         ticks: {
           // Use proper type signature for callback function
           callback: function(tickValue: number | string) {
-            // Only apply Math.ceil to numeric values
-            return typeof tickValue === 'number' ? Math.ceil(tickValue) : tickValue;
+            // Only apply Math.ceil to numeric values and add commas for percentages too
+            if (typeof tickValue === 'number') {
+              return formatNumber(tickValue);
+            }
+            return tickValue;
           }
         }
       },
@@ -93,12 +105,18 @@ const ChartComponent: React.FC<ChartComponentProps> = ({ data }) => {
             
             // Round up the value - ensure it's a number first
             const rawValue = context.raw;
-            const value = typeof rawValue === 'number' ? Math.ceil(rawValue) : rawValue;
+            let formattedValue = '';
             
-            if (context.dataset.yAxisID === 'y1') {
-              label += value + '%';
+            if (typeof rawValue === 'number') {
+              formattedValue = formatNumber(rawValue);
+              
+              if (context.dataset.yAxisID === 'y1') {
+                label += formattedValue + '%';
+              } else {
+                label += '$' + formattedValue;
+              }
             } else {
-              label += '$' + value;
+              label += rawValue;
             }
             
             return label;
