@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CalculatorState, CalculationResults, ChartData, RecommendationItem, ValidationErrors } from '../types';
+import { CalculatorState, CalculationResults, ChartData, RecommendationItem } from '../types';
 import useFormValidation from './useFormValidation';
 
 /**

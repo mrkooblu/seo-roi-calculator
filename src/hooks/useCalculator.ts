@@ -6,9 +6,6 @@ import {
   CalculatorTab 
 } from '../types/calculator';
 import { 
-  CalculationResults, 
-  ChartDataPoint, 
-  RecommendationItem, 
   ROIResults 
 } from '../types/results';
 import { 

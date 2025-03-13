@@ -68,7 +68,7 @@ export const calculateAdvancedROI = (
 
   // Set default values based on selections
   let defaultKeywords = 10;
-  let defaultSearchVolume = 500;
+  const defaultSearchVolume = 500;
   let defaultCTR = 3.5;
   let defaultConversionRate = 2.5;
 

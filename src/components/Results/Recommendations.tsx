@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { RecommendationItem } from '../../types';
+import type { RecommendationItem } from '../../types';
 import ResultCard from './ResultCard';
 import { FiExternalLink } from 'react-icons/fi';
 
@@ -57,7 +57,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ recommendations }) =>
                 {recommendation.items && recommendation.items.length > 0 && (
                   <RecommendationList>
                     {recommendation.items.map((item, itemIndex) => (
-                      <RecommendationItem key={itemIndex}>{item}</RecommendationItem>
+                      <RecommendationListItem key={itemIndex}>{item}</RecommendationListItem>
                     ))}
                   </RecommendationList>
                 )}
@@ -157,7 +157,7 @@ const RecommendationList = styled.ul`
   padding-left: ${({ theme }) => theme.spacing.lg};
 `;
 
-const RecommendationItem = styled.li`
+const RecommendationListItem = styled.li`
   font-size: ${({ theme }) => theme.typography.fontSize.base};
   color: ${({ theme }) => theme.colors.text.primary};
   margin-bottom: ${({ theme }) => theme.spacing.xs};
