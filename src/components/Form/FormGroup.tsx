@@ -29,7 +29,11 @@ const FormGroup: React.FC<FormGroupProps> = ({
           {required && <RequiredAsterisk>*</RequiredAsterisk>}
         </Label>
         {tooltip && (
-          <Tooltip content={tooltip}>
+          <Tooltip 
+            content={tooltip} 
+            position="bottom" 
+            maxWidth={300}
+          >
             <TooltipTrigger tabIndex={0} aria-label={`Help information for ${label}`}>
               <QuestionIcon>?</QuestionIcon>
             </TooltipTrigger>
@@ -74,6 +78,11 @@ const TooltipTrigger = styled.span`
   justify-content: center;
   margin-left: ${({ theme }) => theme.spacing.xs};
   cursor: help;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 
 const QuestionIcon = styled.span`
@@ -87,6 +96,7 @@ const QuestionIcon = styled.span`
   background-color: ${({ theme }) => theme.colors.primary};
   color: white;
   font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 `;
 
 const HelperText = styled.div`
