@@ -4,6 +4,8 @@ import { CalculationResults } from '../../types';
 import ROIChart from './ROIChart';
 import Recommendations from './Recommendations';
 import ResultItem from './ResultItem';
+import Tooltip from '../Form/Tooltip';
+import { FiInfo } from 'react-icons/fi';
 
 // this is a change
 
@@ -75,21 +77,51 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
       </ResultsGrid>
 
       <ChartSection>
-        <SectionTitle>Traffic Growth Projection</SectionTitle>
+        <SectionTitleWrapper>
+          <SectionTitle>Traffic Growth Projection</SectionTitle>
+          <CustomTooltipWrapper>
+            <Tooltip 
+              content="Visualizes your organic traffic growth over time, calculated using S-curve modeling that accounts for typical SEO momentum patterns."
+              position="right"
+            >
+              <ChartInfoIcon />
+            </Tooltip>
+          </CustomTooltipWrapper>
+        </SectionTitleWrapper>
         <ChartContainer>
           <ROIChart data={trafficGrowthChart} />
         </ChartContainer>
       </ChartSection>
       
       <ChartSection>
-        <SectionTitle>Revenue Growth Projection</SectionTitle>
+        <SectionTitleWrapper>
+          <SectionTitle>Revenue Growth Projection</SectionTitle>
+          <CustomTooltipWrapper>
+            <Tooltip 
+              content="Shows how your revenue is expected to grow as traffic and conversions increase, incorporating time-based conversion rate maturation."
+              position="right"
+            >
+              <ChartInfoIcon />
+            </Tooltip>
+          </CustomTooltipWrapper>
+        </SectionTitleWrapper>
         <ChartContainer>
           <ROIChart data={revenueGrowthChart} />
         </ChartContainer>
       </ChartSection>
       
       <ChartSection>
-        <SectionTitle>ROI Comparison</SectionTitle>
+        <SectionTitleWrapper>
+          <SectionTitle>ROI Comparison</SectionTitle>
+          <CustomTooltipWrapper>
+            <Tooltip 
+              content="Compares your cumulative investment against returns over time, showing the point where your SEO efforts become profitable."
+              position="right"
+            >
+              <ChartInfoIcon />
+            </Tooltip>
+          </CustomTooltipWrapper>
+        </SectionTitleWrapper>
         <ChartContainer>
           <ROIChart data={roiComparisonChart} />
         </ChartContainer>
@@ -180,6 +212,54 @@ const SectionTitle = styled.h3`
   @media (max-width: 768px) {
     font-size: ${({ theme }) => theme.typography.fontSize.lg};
   }
+`;
+
+const SectionTitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
+
+const CustomTooltipWrapper = styled.div`
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  line-height: 1;
+  
+  /* Ensure vertical alignment */
+  position: relative;
+  top: 1px;
+  
+  /* Override tooltip content styling */
+  div[role="tooltip"] {
+    background-color: #EBF3FF;
+    color: black;
+    font-weight: 400;
+  }
+  
+  /* Override tooltip arrow styling */
+  div[role="tooltip"] > div {
+    border-color: transparent;
+    &[class*="right"] {
+      border-right-color: #EBF3FF;
+    }
+    &[class*="top"] {
+      border-top-color: #EBF3FF;
+    }
+    &[class*="bottom"] {
+      border-bottom-color: #EBF3FF;
+    }
+    &[class*="left"] {
+      border-left-color: #EBF3FF;
+    }
+  }
+`;
+
+const ChartInfoIcon = styled(FiInfo)`
+  width: 18px;
+  height: 18px;
+  color: ${({ theme }) => theme.colors.primary};
+  display: block; /* Ensures no extra spacing */
 `;
 
 const RecommendationsSection = styled.div`

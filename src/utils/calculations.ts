@@ -1,6 +1,14 @@
 import { CalculatorInputs, AdvancedCalculatorInputs, CompetitionLevel } from '../types/calculator';
 import { CalculationResults, ChartDataPoint, RecommendationItem } from '../types/results';
 
+// Define a type for extended inputs that might be cast from basic inputs
+type ExtendedInputsProps = {
+  competitionLevel?: CompetitionLevel;
+  seoGoal?: 'leads' | 'brand' | 'traffic' | 'sales';
+  contentInvestment?: number;
+  linkBuildingInvestment?: number;
+};
+
 /**
  * Calculate Return on Investment (ROI) for SEO efforts using enhanced calculation models
  * Updated with S-curve growth modeling, discounted cash flow, and conversion rate maturation
@@ -15,7 +23,8 @@ export const calculateROI = (inputs: CalculatorInputs): CalculationResults => {
     seoInvestment,
     lifetimeValueMultiplier,
     profitMargin,
-    timePeriod
+    timePeriod,
+    advancedOptionsVisible
   } = inputs;
 
   // S-curve traffic growth modeling instead of linear growth
@@ -37,8 +46,8 @@ export const calculateROI = (inputs: CalculatorInputs): CalculationResults => {
   
   // Adjust for keyword difficulty based on formula
   // Use a default medium competition level if not specified
-  const competitionLevel: CompetitionLevel = 
-    (inputs as any).competitionLevel || 'medium';
+  const extendedInputs = inputs as CalculatorInputs & ExtendedInputsProps;
+  const competitionLevel: CompetitionLevel = extendedInputs.competitionLevel || 'medium';
   const assumedKeywordDifficulty = competitionLevel === 'high' ? 70 : 
                                    competitionLevel === 'medium' ? 50 : 30;
   const keywordDifficultyAdjustment = 1 - (Math.pow(assumedKeywordDifficulty, 2) / 10000);
@@ -51,13 +60,14 @@ export const calculateROI = (inputs: CalculatorInputs): CalculationResults => {
   let industryValueMultiplier = 1;
   
   // Access optional advanced properties safely
-  const advancedInputs = inputs as any;
-  if (advancedInputs.seoGoal === 'leads') {
+  if (extendedInputs.seoGoal === 'leads') {
     // B2B sales cycle adjustment - delay factor
     const leadTime = 3; // Average months to convert lead
     industryValueMultiplier = timePeriod > leadTime ? (timePeriod - leadTime) / timePeriod : 0.5;
-  } else if (inputs.advancedOptionsVisible && 
-            advancedInputs.contentInvestment > advancedInputs.linkBuildingInvestment) {
+  } else if (advancedOptionsVisible && 
+            extendedInputs.contentInvestment && 
+            extendedInputs.linkBuildingInvestment &&
+            extendedInputs.contentInvestment > extendedInputs.linkBuildingInvestment) {
     // Content-heavy strategy typically increases LTV
     industryValueMultiplier = 1.15;
   }
@@ -179,7 +189,7 @@ export const calculateAdvancedROI = (
 
   // Set default values based on selections
   let defaultKeywords = 10;
-  let defaultSearchVolume = 500; // Changed from const to let
+  let defaultSearchVolume = 500;
   let defaultCTR = 3.5;
   let defaultConversionRate = 2.5;
 
@@ -216,7 +226,7 @@ export const calculateAdvancedROI = (
 
   // Apply industry-specific adjustments
   let profitMargin = basicInputs.profitMargin || 50;
-  let averageOrderValue = basicInputs.avgOrderValue || 0;
+  const averageOrderValue = basicInputs.avgOrderValue || 0;
   
   // B2B sales cycle adjustments
   if (seoGoal === 'leads' && averageOrderValue > 500) {
@@ -249,13 +259,14 @@ export const calculateAdvancedROI = (
     conversionRate: defaultConversionRate,
     lifetimeValueMultiplier: ltv,
     profitMargin: profitMargin,
-    seoInvestment: totalInvestment,
+    seoInvestment: totalInvestment
   };
   
-  // Add competitionLevel to the result object for use in calculations
-  (result as any).competitionLevel = competitionLevel;
-  
-  return result;
+  // Add competition level safely with proper type assertion
+  return {
+    ...result,
+    competitionLevel
+  } as CalculatorInputs;
 };
 
 /**
