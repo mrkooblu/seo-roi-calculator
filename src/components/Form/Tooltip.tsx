@@ -1,43 +1,37 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { FiInfo } from 'react-icons/fi';
 
 interface TooltipProps {
   content: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   position?: 'top' | 'right' | 'bottom' | 'left';
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ content, children, position = 'top' }) => {
+/**
+ * A tooltip component that displays information when hovered or focused
+ * Can be used standalone with an info icon or wrapped around other elements
+ */
+const Tooltip: React.FC<TooltipProps> = ({ 
+  content, 
+  children, 
+  position = 'top' 
+}) => {
   const [isVisible, setIsVisible] = useState(false);
-  const tooltipRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseEnter = () => {
-    setIsVisible(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsVisible(false);
-  };
-
-  const handleFocus = () => {
-    setIsVisible(true);
-  };
-
-  const handleBlur = () => {
-    setIsVisible(false);
-  };
+  const showTooltip = () => setIsVisible(true);
+  const hideTooltip = () => setIsVisible(false);
 
   return (
     <TooltipContainer
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
+      onFocus={showTooltip}
+      onBlur={hideTooltip}
     >
-      {children}
+      {children || <InfoIcon />}
       {isVisible && (
-        <TooltipContent
-          ref={tooltipRef}
+        <TooltipContent 
           role="tooltip"
           $position={position}
           aria-hidden={!isVisible}
@@ -53,7 +47,15 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children, position = 'top' }
 const TooltipContainer = styled.div`
   position: relative;
   display: inline-flex;
-  vertical-align: middle;
+  align-items: center;
+  cursor: pointer;
+`;
+
+const InfoIcon = styled(FiInfo)`
+  color: ${({ theme }) => theme.colors.primary};
+  margin-left: 5px;
+  width: 16px;
+  height: 16px;
 `;
 
 interface TooltipContentProps {
@@ -62,46 +64,43 @@ interface TooltipContentProps {
 
 const TooltipContent = styled.div<TooltipContentProps>`
   position: absolute;
-  z-index: 10;
-  background-color: ${({ theme }) => theme.colors.text.primary};
-  color: white;
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  font-weight: ${({ theme }) => theme.typography.fontWeight.normal};
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  z-index: 100;
+  background-color: ${({ theme }) => theme.colors.background.dark};
+  color: ${({ theme }) => theme.colors.text.light};
+  padding: 8px 12px;
   border-radius: ${({ theme }) => theme.borderRadius.sm};
+  font-size: 14px;
+  width: max-content;
   max-width: 250px;
-  word-wrap: break-word;
+  text-align: center;
   box-shadow: ${({ theme }) => theme.shadows.md};
   
+  /* Position the tooltip based on the position prop */
   ${({ $position }) => {
     switch ($position) {
       case 'top':
         return `
           bottom: 100%;
           left: 50%;
-          transform: translateX(-50%);
-          margin-bottom: 5px;
+          transform: translateX(-50%) translateY(-10px);
         `;
       case 'right':
         return `
           left: 100%;
           top: 50%;
-          transform: translateY(-50%);
-          margin-left: 5px;
+          transform: translateY(-50%) translateX(10px);
         `;
       case 'bottom':
         return `
           top: 100%;
           left: 50%;
-          transform: translateX(-50%);
-          margin-top: 5px;
+          transform: translateX(-50%) translateY(10px);
         `;
       case 'left':
         return `
           right: 100%;
           top: 50%;
-          transform: translateY(-50%);
-          margin-right: 5px;
+          transform: translateY(-50%) translateX(-10px);
         `;
       default:
         return '';
@@ -116,7 +115,7 @@ const TooltipArrow = styled.div<TooltipContentProps>`
   border-style: solid;
   
   ${({ $position, theme }) => {
-    const backgroundColor = theme.colors.text.primary;
+    const backgroundColor = theme.colors.background.dark;
     
     switch ($position) {
       case 'top':

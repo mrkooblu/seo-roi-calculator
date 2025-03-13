@@ -2,14 +2,14 @@ import React from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import Container from '../components/Layout/Container';
-import Header from '../components/Layout/Header';
+import PageHeader from '../components/Layout/PageHeader';
 import Calculator from '../components/Calculator';
 
 const Home: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Advanced SEO ROI Calculator</title>
+        <title>SEO ROI Calculator</title>
         <meta
           name="description"
           content="Calculate the return on investment (ROI) of your SEO efforts with our advanced SEO ROI calculator."
@@ -19,7 +19,10 @@ const Home: React.FC = () => {
 
       <Main>
         <Container>
-          <Header />
+          <PageHeader 
+            title="SEO ROI Calculator" 
+            description="Estimate the financial impact of your SEO investments with our interactive calculator. Enter your traffic metrics, conversion rates, and investment details to get a comprehensive analysis of your projected ROI, break-even point, and tailored strategy recommendations."
+          />
           <Calculator />
         </Container>
       </Main>
@@ -30,6 +33,7 @@ const Home: React.FC = () => {
 const Main = styled.main`
   min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.background};
+  padding: ${({ theme }) => theme.spacing.xl} 0;
 `;
 
 export default Home; 

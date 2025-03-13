@@ -8,7 +8,7 @@ import { useCalculatorState } from '../../hooks/useCalculatorState';
 
 const Calculator: React.FC = () => {
   const [calculatorMode, setCalculatorMode] = useState<'basic' | 'advanced'>('basic');
-  const { state, updateState, resetState, calculateResults } = useCalculatorState();
+  const { state, errors, updateState, resetState, calculateResults, getFieldError } = useCalculatorState();
   const [results, setResults] = useState<CalculationResults | null>(null);
 
   const handleModeToggle = (mode: 'basic' | 'advanced') => {
@@ -17,7 +17,9 @@ const Calculator: React.FC = () => {
 
   const handleCalculate = () => {
     const calculationResults = calculateResults();
-    setResults(calculationResults);
+    if (calculationResults) {
+      setResults(calculationResults);
+    }
   };
 
   const handleReset = () => {
@@ -44,15 +46,34 @@ const Calculator: React.FC = () => {
 
       <CalculatorContent>
         {calculatorMode === 'basic' ? (
-          <BasicCalculator state={state} updateState={updateState} />
+          <BasicCalculator 
+            state={state} 
+            updateState={updateState} 
+            getFieldError={getFieldError}
+          />
         ) : (
-          <AdvancedCalculator state={state} updateState={updateState} />
+          <AdvancedCalculator 
+            state={state} 
+            updateState={updateState} 
+            getFieldError={getFieldError}
+          />
         )}
 
         <ButtonGroup>
           <Button $primary onClick={handleCalculate}>Calculate ROI</Button>
           <Button onClick={handleReset}>Reset</Button>
         </ButtonGroup>
+
+        {Object.keys(errors).length > 0 && (
+          <ErrorSummary>
+            <ErrorTitle>Please fix the following errors:</ErrorTitle>
+            <ErrorList>
+              {Object.entries(errors).map(([field, message]) => (
+                <ErrorItem key={field}>{message}</ErrorItem>
+              ))}
+            </ErrorList>
+          </ErrorSummary>
+        )}
       </CalculatorContent>
 
       {results && <Results results={results} />}
@@ -122,6 +143,31 @@ const Button = styled.button<ButtonProps>`
     background-color: ${(props) => props.$primary ? props.theme.colors.primary : props.theme.colors.background};
     opacity: ${(props) => props.$primary ? 0.9 : 1};
   }
+`;
+
+const ErrorSummary = styled.div`
+  margin-top: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid ${({ theme }) => theme.colors.danger};
+`;
+
+const ErrorTitle = styled.h4`
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semiBold};
+  color: ${({ theme }) => theme.colors.danger};
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
+`;
+
+const ErrorList = styled.ul`
+  padding-left: ${({ theme }) => theme.spacing.lg};
+`;
+
+const ErrorItem = styled.li`
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  color: ${({ theme }) => theme.colors.danger};
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
 export default Calculator; 

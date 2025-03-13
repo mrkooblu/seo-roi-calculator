@@ -1,57 +1,104 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FormGroupProps } from '../../types/forms';
 import Tooltip from './Tooltip';
+
+interface FormGroupProps {
+  id: string;
+  label: string;
+  children: React.ReactNode;
+  tooltip?: string;
+  helperText?: string;
+  error?: string;
+  required?: boolean;
+}
 
 const FormGroup: React.FC<FormGroupProps> = ({
   id,
   label,
-  required = false,
+  children,
   tooltip,
   helperText,
-  children,
-  error
+  error,
+  required = false,
 }) => {
   return (
-    <StyledFormGroup>
-      <StyledLabel htmlFor={id}>
-        {label} {required && <Required>*</Required>}
-        {tooltip && <Tooltip text={tooltip} />}
-      </StyledLabel>
+    <FormGroupContainer>
+      <LabelContainer>
+        <Label htmlFor={id}>
+          {label}
+          {required && <RequiredAsterisk>*</RequiredAsterisk>}
+        </Label>
+        {tooltip && (
+          <Tooltip content={tooltip}>
+            <TooltipTrigger tabIndex={0} aria-label={`Help information for ${label}`}>
+              <QuestionIcon>?</QuestionIcon>
+            </TooltipTrigger>
+          </Tooltip>
+        )}
+      </LabelContainer>
+      
       {children}
+      
       {helperText && <HelperText>{helperText}</HelperText>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
-    </StyledFormGroup>
+    </FormGroupContainer>
   );
 };
 
-const StyledFormGroup = styled.div`
-  margin-bottom: 25px;
+const FormGroupContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
-const StyledLabel = styled.label`
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  color: ${({ theme }) => theme.colors.textPrimary};
+const LabelContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
-const Required = styled.span`
-  color: ${({ theme }) => theme.colors.chart.red};
+const Label = styled.label`
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+  color: ${({ theme }) => theme.colors.text.primary};
 `;
 
-const HelperText = styled.p`
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.textSecondary};
-  margin-top: 5px;
+const RequiredAsterisk = styled.span`
+  color: ${({ theme }) => theme.colors.danger};
+  margin-left: 3px;
 `;
 
-const ErrorMessage = styled.p`
-  color: ${({ theme }) => theme.colors.chart.red};
-  font-size: 14px;
-  margin-top: 5px;
+const TooltipTrigger = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: ${({ theme }) => theme.spacing.xs};
+  cursor: help;
+`;
+
+const QuestionIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: white;
+  font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+`;
+
+const HelperText = styled.div`
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  margin-top: 4px;
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const ErrorMessage = styled.div`
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  margin-top: 4px;
+  color: ${({ theme }) => theme.colors.danger};
 `;
 
 export default FormGroup; 

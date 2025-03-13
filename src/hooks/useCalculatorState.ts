@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import { CalculatorState, CalculationResults, ChartData, RecommendationItem } from '../types';
+import { CalculatorState, CalculationResults, ChartData, RecommendationItem, ValidationErrors } from '../types';
+import useFormValidation from './useFormValidation';
 
+/**
+ * Initial calculator state with default values
+ */
 const initialState: CalculatorState = {
   // Basic calculator inputs
   currentTraffic: 1000,
@@ -22,9 +26,26 @@ const initialState: CalculatorState = {
   timeframe: 12,
 };
 
+/**
+ * Custom hook for managing calculator state and calculations
+ * 
+ * @returns {Object} Calculator state and methods
+ * @returns {CalculatorState} state - Current calculator state values
+ * @returns {ValidationErrors} errors - Validation errors keyed by field name
+ * @returns {Function} updateState - Function to update state values
+ * @returns {Function} resetState - Function to reset state to initial values
+ * @returns {Function} calculateResults - Function to calculate results based on current state
+ * @returns {Function} getFieldError - Function to get error for a specific field
+ */
 export const useCalculatorState = () => {
   const [state, setState] = useState<CalculatorState>(initialState);
+  const { errors, validateCalculatorInputs, clearErrors, getFieldError } = useFormValidation();
 
+  /**
+   * Updates the calculator state with new values
+   * 
+   * @param {Partial<CalculatorState>} updates - Object containing the fields to update
+   */
   const updateState = (updates: Partial<CalculatorState>) => {
     setState(prevState => ({
       ...prevState,
@@ -32,11 +53,26 @@ export const useCalculatorState = () => {
     }));
   };
 
+  /**
+   * Resets calculator state to initial values and clears validation errors
+   */
   const resetState = () => {
     setState(initialState);
+    clearErrors();
   };
 
-  const calculateResults = (): CalculationResults => {
+  /**
+   * Calculates ROI and related metrics based on current state
+   * Validates inputs before calculation
+   * 
+   * @returns {CalculationResults | null} Calculation results or null if validation fails
+   */
+  const calculateResults = (): CalculationResults | null => {
+    // Validate inputs before calculating
+    if (!validateCalculatorInputs(state)) {
+      return null;
+    }
+    
     // Basic calculations
     const monthlyConversions = (state.currentTraffic * state.conversionRate) / 100;
     const initialRevenue = monthlyConversions * state.averageOrderValue;
@@ -75,7 +111,11 @@ export const useCalculatorState = () => {
     };
   };
 
-  // Helper functions for chart data generation
+  /**
+   * Generates traffic growth chart data based on current state
+   * 
+   * @returns {ChartData} Chart data for traffic growth visualization
+   */
   const generateTrafficGrowthChart = (): ChartData => {
     const labels: string[] = [];
     const currentTrafficData: number[] = [];
@@ -115,6 +155,11 @@ export const useCalculatorState = () => {
     };
   };
 
+  /**
+   * Generates revenue growth chart data based on current state
+   * 
+   * @returns {ChartData} Chart data for revenue growth visualization
+   */
   const generateRevenueGrowthChart = (): ChartData => {
     const labels: string[] = [];
     const currentRevenueData: number[] = [];
@@ -157,6 +202,11 @@ export const useCalculatorState = () => {
     };
   };
 
+  /**
+   * Generates ROI comparison chart data based on current state
+   * 
+   * @returns {ChartData} Chart data for ROI comparison visualization
+   */
   const generateROIComparisonChart = (): ChartData => {
     // Simple ROI comparison by month
     const labels: string[] = [];
@@ -222,6 +272,12 @@ export const useCalculatorState = () => {
     };
   };
 
+  /**
+   * Generates tailored recommendations based on calculation results
+   * 
+   * @param {number} roi - Calculated ROI percentage
+   * @returns {RecommendationItem[]} Array of recommendation objects
+   */
   const generateRecommendations = (roi: number): RecommendationItem[] => {
     const recommendations: RecommendationItem[] = [];
     
@@ -320,8 +376,10 @@ export const useCalculatorState = () => {
 
   return {
     state,
+    errors,
     updateState,
     resetState,
     calculateResults,
+    getFieldError,
   };
 }; 

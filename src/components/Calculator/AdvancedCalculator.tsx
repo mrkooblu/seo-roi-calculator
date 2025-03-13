@@ -1,13 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import { CalculatorState } from '../../types';
+import FormGroup from '../Form/FormGroup';
+import InputGroup from '../Form/InputGroup';
 
 interface AdvancedCalculatorProps {
   state: CalculatorState;
   updateState: (updates: Partial<CalculatorState>) => void;
+  getFieldError: (fieldName: string) => string | undefined;
 }
 
-const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateState }) => {
+const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateState, getFieldError }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
@@ -30,33 +33,50 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
       
       <SectionTitle>Traffic & Conversion Metrics</SectionTitle>
       <FormGrid>
-        <FormGroup>
-          <Label htmlFor="currentTraffic">Current Monthly Organic Traffic</Label>
-          <Input
+        <FormGroup
+          id="currentTraffic"
+          label="Current Monthly Organic Traffic"
+          tooltip="The number of monthly visitors coming to your site through organic search"
+          error={getFieldError('currentTraffic')}
+          required
+        >
+          <InputGroup
             id="currentTraffic"
             name="currentTraffic"
             type="number"
             value={state.currentTraffic || ''}
             onChange={handleInputChange}
             placeholder="e.g. 1000"
+            error={getFieldError('currentTraffic')}
           />
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="targetTraffic">Target Monthly Organic Traffic</Label>
-          <Input
+        <FormGroup
+          id="targetTraffic"
+          label="Target Monthly Organic Traffic"
+          tooltip="Your goal for monthly organic traffic after SEO improvements"
+          error={getFieldError('targetTraffic')}
+          required
+        >
+          <InputGroup
             id="targetTraffic"
             name="targetTraffic"
             type="number"
             value={state.targetTraffic || ''}
             onChange={handleInputChange}
             placeholder="e.g. 2000"
+            error={getFieldError('targetTraffic')}
           />
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="organicCTR">Organic CTR (%)</Label>
-          <Input
+        <FormGroup
+          id="organicCTR"
+          label="Organic CTR (%)"
+          tooltip="The percentage of search impressions that result in clicks to your site"
+          helperText="Average is 3-5% for position #1"
+          error={getFieldError('organicCTR')}
+        >
+          <InputGroup
             id="organicCTR"
             name="organicCTR"
             type="number"
@@ -64,12 +84,20 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             onChange={handleInputChange}
             placeholder="e.g. 3.5"
             step="0.1"
+            suffix="%"
+            error={getFieldError('organicCTR')}
           />
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="conversionRate">Conversion Rate (%)</Label>
-          <Input
+        <FormGroup
+          id="conversionRate"
+          label="Conversion Rate (%)"
+          tooltip="The percentage of visitors who complete a desired action"
+          helperText="Average rates range from 1-5%"
+          error={getFieldError('conversionRate')}
+          required
+        >
+          <InputGroup
             id="conversionRate"
             name="conversionRate"
             type="number"
@@ -77,12 +105,19 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             onChange={handleInputChange}
             placeholder="e.g. 2"
             step="0.1"
+            suffix="%"
+            error={getFieldError('conversionRate')}
           />
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="averageOrderValue">Average Order Value ($)</Label>
-          <Input
+        <FormGroup
+          id="averageOrderValue"
+          label="Average Order Value ($)"
+          tooltip="The average amount customers spend per transaction"
+          error={getFieldError('averageOrderValue')}
+          required
+        >
+          <InputGroup
             id="averageOrderValue"
             name="averageOrderValue"
             type="number"
@@ -90,15 +125,22 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             onChange={handleInputChange}
             placeholder="e.g. 100"
             step="0.01"
+            prefix="$"
+            error={getFieldError('averageOrderValue')}
           />
         </FormGroup>
       </FormGrid>
       
       <SectionTitle>SEO Strategy Factors</SectionTitle>
       <FormGrid>
-        <FormGroup>
-          <Label htmlFor="keywordDifficulty">Keyword Difficulty (1-100)</Label>
-          <Input
+        <FormGroup
+          id="keywordDifficulty"
+          label="Keyword Difficulty (1-100)"
+          tooltip="How difficult it is to rank for your target keywords"
+          helperText="Higher values mean more competitive keywords"
+          error={getFieldError('keywordDifficulty')}
+        >
+          <InputGroup
             id="keywordDifficulty"
             name="keywordDifficulty"
             type="number"
@@ -107,11 +149,16 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             placeholder="e.g. 40"
             min="1"
             max="100"
+            error={getFieldError('keywordDifficulty')}
           />
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="competitionLevel">Competition Level</Label>
+        <FormGroup
+          id="competitionLevel"
+          label="Competition Level"
+          tooltip="How competitive your industry is for SEO"
+          error={getFieldError('competitionLevel')}
+        >
           <Select
             id="competitionLevel"
             name="competitionLevel"
@@ -124,8 +171,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
           </Select>
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="industryType">Industry Type</Label>
+        <FormGroup
+          id="industryType"
+          label="Industry Type"
+          tooltip="Your business category for more relevant recommendations"
+          error={getFieldError('industryType')}
+        >
           <Select
             id="industryType"
             name="industryType"
@@ -141,10 +192,15 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
       </FormGrid>
       
       <SectionTitle>Investment Breakdown</SectionTitle>
+      <InvestmentNote>These three percentages should add up to 100%</InvestmentNote>
       <FormGrid>
-        <FormGroup>
-          <Label htmlFor="contentInvestment">Content Investment (%)</Label>
-          <Input
+        <FormGroup
+          id="contentInvestment"
+          label="Content Investment (%)"
+          tooltip="Percentage of your SEO budget allocated to content creation"
+          error={getFieldError('contentInvestment')}
+        >
+          <InputGroup
             id="contentInvestment"
             name="contentInvestment"
             type="number"
@@ -153,12 +209,18 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             placeholder="e.g. 30"
             min="0"
             max="100"
+            suffix="%"
+            error={getFieldError('contentInvestment')}
           />
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="linkBuildingInvestment">Link Building Investment (%)</Label>
-          <Input
+        <FormGroup
+          id="linkBuildingInvestment"
+          label="Link Building Investment (%)"
+          tooltip="Percentage of your SEO budget allocated to link building"
+          error={getFieldError('linkBuildingInvestment')}
+        >
+          <InputGroup
             id="linkBuildingInvestment"
             name="linkBuildingInvestment"
             type="number"
@@ -167,12 +229,18 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             placeholder="e.g. 40"
             min="0"
             max="100"
+            suffix="%"
+            error={getFieldError('linkBuildingInvestment')}
           />
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="technicalSEOInvestment">Technical SEO Investment (%)</Label>
-          <Input
+        <FormGroup
+          id="technicalSEOInvestment"
+          label="Technical SEO Investment (%)"
+          tooltip="Percentage of your SEO budget allocated to technical improvements"
+          error={getFieldError('technicalSEOInvestment')}
+        >
+          <InputGroup
             id="technicalSEOInvestment"
             name="technicalSEOInvestment"
             type="number"
@@ -181,12 +249,19 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             placeholder="e.g. 30"
             min="0"
             max="100"
+            suffix="%"
+            error={getFieldError('technicalSEOInvestment')}
           />
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="monthlySEOCost">Total Monthly SEO Investment ($)</Label>
-          <Input
+        <FormGroup
+          id="monthlySEOCost"
+          label="Total Monthly SEO Investment ($)"
+          tooltip="Your monthly spend on SEO services, tools, and resources"
+          error={getFieldError('monthlySEOCost')}
+          required
+        >
+          <InputGroup
             id="monthlySEOCost"
             name="monthlySEOCost"
             type="number"
@@ -194,12 +269,19 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             onChange={handleInputChange}
             placeholder="e.g. 1000"
             step="0.01"
+            prefix="$"
+            error={getFieldError('monthlySEOCost')}
           />
         </FormGroup>
         
-        <FormGroup>
-          <Label htmlFor="timeframe">Timeframe (Months)</Label>
-          <Input
+        <FormGroup
+          id="timeframe"
+          label="Timeframe (Months)"
+          tooltip="The period over which you want to calculate ROI"
+          error={getFieldError('timeframe')}
+          required
+        >
+          <InputGroup
             id="timeframe"
             name="timeframe"
             type="number"
@@ -208,6 +290,7 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             placeholder="e.g. 12"
             min="1"
             max="60"
+            error={getFieldError('timeframe')}
           />
         </FormGroup>
       </FormGrid>
@@ -241,41 +324,17 @@ const SectionTitle = styled.h4`
   padding-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
+const InvestmentNote = styled.p`
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-style: italic;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
+
 const FormGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: ${({ theme }) => theme.spacing.lg};
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
-  margin-bottom: ${({ theme }) => theme.spacing.xs};
-  color: ${({ theme }) => theme.colors.text.primary};
-`;
-
-const Input = styled.input`
-  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
-  color: ${({ theme }) => theme.colors.text.primary};
-  transition: ${({ theme }) => theme.transitions.default};
-  
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 0 2px ${({ theme }) => `${theme.colors.primary}33`};
-  }
-  
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.text.muted};
-  }
 `;
 
 const Select = styled.select`
@@ -286,6 +345,7 @@ const Select = styled.select`
   color: ${({ theme }) => theme.colors.text.primary};
   background-color: white;
   transition: ${({ theme }) => theme.transitions.default};
+  width: 100%;
   
   &:focus {
     outline: none;

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { RecommendationItem } from '../../types';
+import ResultCard from './ResultCard';
 
 interface RecommendationsProps {
   recommendations: RecommendationItem[];
@@ -8,12 +9,12 @@ interface RecommendationsProps {
 
 const Recommendations: React.FC<RecommendationsProps> = ({ recommendations }) => {
   return (
-    <ResultCard>
-      <RecommendationsContainer>
-        {recommendations.map((recommendation, index) => (
-          <RecommendationSection key={index}>
+    <RecommendationsContainer>
+      {recommendations.map((recommendation, index) => (
+        <ResultCard key={index}>
+          <RecommendationSection>
             <RecommendationTitle>
-              <strong>{recommendation.title}</strong>
+              {recommendation.title}
             </RecommendationTitle>
             
             <RecommendationDescription>
@@ -23,16 +24,14 @@ const Recommendations: React.FC<RecommendationsProps> = ({ recommendations }) =>
             {recommendation.items && recommendation.items.length > 0 && (
               <RecommendationList>
                 {recommendation.items.map((item, itemIndex) => (
-                  <RecommendationItem key={itemIndex}>
-                    {item}
-                  </RecommendationItem>
+                  <RecommendationItem key={itemIndex}>{item}</RecommendationItem>
                 ))}
               </RecommendationList>
             )}
           </RecommendationSection>
-        ))}
-      </RecommendationsContainer>
-    </ResultCard>
+        </ResultCard>
+      ))}
+    </RecommendationsContainer>
   );
 };
 
@@ -42,12 +41,7 @@ const RecommendationsContainer = styled.div`
   gap: ${({ theme }) => theme.spacing.lg};
 `;
 
-const RecommendationSection = styled.div`
-  background-color: ${({ theme }) => theme.colors.background};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  padding: ${({ theme }) => theme.spacing.lg};
-  box-shadow: ${({ theme }) => theme.shadows.sm};
-`;
+const RecommendationSection = styled.div``;
 
 const RecommendationTitle = styled.h4`
   font-size: ${({ theme }) => theme.typography.fontSize.lg};

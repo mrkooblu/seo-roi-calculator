@@ -38,6 +38,11 @@ export interface CalculationResults {
   recommendations: RecommendationItem[];
 }
 
+// Form validation types
+export interface ValidationErrors {
+  [key: string]: string;
+}
+
 // Chart-related types
 export interface ChartData {
   labels: string[];
