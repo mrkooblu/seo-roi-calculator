@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { CalculatorTab } from '../../types/calculator';
 
 interface CalculatorTabsProps {
@@ -7,48 +7,113 @@ interface CalculatorTabsProps {
   onTabChange: (tab: CalculatorTab) => void;
 }
 
+/**
+ * CalculatorTabs component provides tab navigation between calculator modes
+ * Includes animation and responsive design
+ */
 const CalculatorTabs: React.FC<CalculatorTabsProps> = ({ activeTab, onTabChange }) => {
   return (
     <TabsContainer>
       <Tab
-        active={activeTab === 'basic'}
+        $active={activeTab === 'basic'}
         onClick={() => onTabChange('basic')}
       >
-        Basic Calculator
+        <TabIcon>📊</TabIcon>
+        <TabText>Basic Calculator</TabText>
       </Tab>
       <Tab
-        active={activeTab === 'advanced'}
+        $active={activeTab === 'advanced'}
         onClick={() => onTabChange('advanced')}
       >
-        Advanced Options
+        <TabIcon>🔍</TabIcon>
+        <TabText>Advanced Options</TabText>
       </Tab>
     </TabsContainer>
   );
 };
 
+const slideDown = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 interface TabProps {
-  active: boolean;
+  $active: boolean;
 }
 
 const TabsContainer = styled.div`
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  animation: ${slideDown} 0.5s ease-out;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    border-bottom: none;
+  }
 `;
 
 const Tab = styled.div<TabProps>`
-  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
   cursor: pointer;
-  border-bottom: 3px solid ${({ active, theme }) => 
-    active ? theme.colors.primary : 'transparent'};
-  font-weight: ${({ active }) => (active ? 600 : 400)};
-  color: ${({ active, theme }) => 
-    active ? theme.colors.primary : theme.colors.textPrimary};
-  transition: all 0.2s ease;
+  position: relative;
+  font-weight: ${({ $active, theme }) => 
+    $active ? theme.typography.fontWeight.semiBold : theme.typography.fontWeight.normal};
+  color: ${({ $active, theme }) => 
+    $active ? theme.colors.primary : theme.colors.text.secondary};
+  transition: all 0.3s ease;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: ${({ $active, theme }) => 
+      $active ? theme.colors.primary : 'transparent'};
+    transition: all 0.3s ease;
+  }
 
   &:hover {
     color: ${({ theme }) => theme.colors.primary};
+    
+    &::after {
+      background-color: ${({ $active, theme }) => 
+        $active ? theme.colors.primary : theme.colors.primary + '40'};
+    }
   }
+  
+  @media (max-width: 768px) {
+    border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+    background-color: ${({ $active, theme }) => 
+      $active ? theme.colors.background : 'transparent'};
+      
+    &::after {
+      width: 4px;
+      height: 100%;
+      top: 0;
+      left: 0;
+      bottom: auto;
+    }
+  }
+`;
+
+const TabIcon = styled.span`
+  margin-right: ${({ theme }) => theme.spacing.sm};
+  font-size: ${({ theme }) => theme.typography.fontSize.lg};
+`;
+
+const TabText = styled.span`
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
 `;
 
 export default CalculatorTabs; 
