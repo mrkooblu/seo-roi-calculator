@@ -64,4 +64,6 @@ export interface RecommendationItem {
   title: string;
   description: string;
   items?: string[];
+  ctaUrl?: string;
+  ctaText?: string;
 } 

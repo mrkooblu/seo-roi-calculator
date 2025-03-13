@@ -292,20 +292,6 @@ export const useCalculatorState = () => {
       ],
     });
     
-    // Traffic-specific recommendations
-    if (state.targetTraffic > state.currentTraffic * 2) {
-      recommendations.push({
-        title: 'Ambitious Traffic Growth Strategy',
-        description: 'Your target traffic represents significant growth. Consider these strategies:',
-        items: [
-          'Conduct comprehensive keyword research focusing on long-tail opportunities',
-          'Develop a robust content calendar with regular publishing schedule',
-          'Invest in technical SEO improvements to ensure site can handle increased traffic',
-          'Implement structured data markup to improve visibility in search results',
-        ],
-      });
-    }
-    
     // Conversion-focused recommendations
     if (state.conversionRate < 3) {
       recommendations.push({
