@@ -190,25 +190,25 @@ export const calculateAdvancedROI = (
   // Set default values based on selections
   let defaultKeywords = 10;
   let defaultSearchVolume = 500;
-  let defaultCTR = 3.5;
+  let defaultCTR = 27.6; // Updated to reflect position #1 CTR
   let defaultConversionRate = 2.5;
 
   // Enhanced competition level adjustments
   if (competitionLevel === 'high') {
-    defaultCTR = Math.max(defaultCTR * 0.7, 1.5); // Multiply instead of flat reduction
+    defaultCTR = Math.max(defaultCTR * 0.7, 15); // Position #2 CTR for high competition
     defaultKeywords = Math.max(defaultKeywords - 3, 3);
   } else if (competitionLevel === 'low') {
-    defaultCTR = defaultCTR * 1.3; // Multiply for proportional increase
+    defaultCTR = Math.min(defaultCTR * 1.1, 30); // Slightly better than position #1 for low competition
     defaultKeywords = defaultKeywords * 1.5; // 50% more keywords in low competition
   }
 
   // More sophisticated ranking adjustments
   if (currentRankings === 'new') {
     defaultKeywords = Math.max(5, defaultKeywords - 5);
-    defaultCTR = defaultCTR * 0.8; // Lower CTR for new sites
+    defaultCTR = 2.5; // Position #10 CTR for new sites
   } else if (currentRankings === 'high') {
     defaultKeywords = defaultKeywords * 2; // Double keywords for high-ranking sites
-    defaultCTR = defaultCTR * 1.4; // 40% higher CTR for high-ranking sites
+    defaultCTR = 27.6; // Position #1 CTR for high-ranking sites
   }
 
   // Enhanced goal-based adjustments
@@ -220,7 +220,7 @@ export const calculateAdvancedROI = (
     defaultConversionRate = 1.0;
     ltv = 2.0; // Brand awareness leads to higher LTV
   } else if (seoGoal === 'traffic') {
-    defaultCTR += 2;
+    defaultCTR = Math.min(defaultCTR + 5, 33); // Boost CTR for traffic-focused goals
     defaultConversionRate = 1.5;
   }
 
@@ -424,12 +424,13 @@ export const generateRecommendations = (
   }
 
   // Enhanced CTR recommendations with ranking analysis
-  if (ctr < 2) {
+  if (ctr < 10) {
     recommendations.push({
-      title: 'Your click-through rate is low.',
-      description: 'To improve:',
+      title: 'Your click-through rate is below typical first-page results.',
+      description: 'To improve your position and CTR:',
       items: [
         'Optimize your meta titles and descriptions to be more compelling',
+        'Target higher ranking positions (top 3) as they get 11-27.6% CTR',
         'Use schema markup to enhance your search results appearance',
         'Target featured snippets to increase visibility',
         'Improve your brand recognition to encourage more clicks',

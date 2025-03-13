@@ -21,8 +21,9 @@ const HeaderWrapper = styled.header`
 `;
 
 const Title = styled.h1`
-  font-size: ${({ theme }) => theme.typography.fontSize.xxl};
-  font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+  font-size: ${({ theme }) => theme.typography.headings.h1.fontSize};
+  font-weight: ${({ theme }) => theme.typography.headings.h1.fontWeight};
+  line-height: ${({ theme }) => theme.typography.headings.h1.lineHeight};
   color: ${({ theme }) => theme.colors.text.primary};
   margin-bottom: ${({ theme }) => theme.spacing.md};
 `;

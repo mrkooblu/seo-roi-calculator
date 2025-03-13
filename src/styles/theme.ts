@@ -38,7 +38,7 @@ const theme = {
   },
   typography: {
     fontFamily: 
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
+      "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif",
     fontSize: {
       xs: '0.75rem',
       sm: '0.875rem',
@@ -55,27 +55,33 @@ const theme = {
       medium: 500,
       semiBold: 600,
       bold: 700,
+      extraBold: 800,
     },
     headings: {
       h1: {
-        fontSize: '32px',
-        lineHeight: '40px',
-        fontWeight: 700,
+        fontSize: '40px',
+        lineHeight: '52px',
+        fontWeight: 800,
       },
       h2: {
-        fontSize: '24px',
-        lineHeight: '32px',
-        fontWeight: 600,
+        fontSize: '30px',
+        lineHeight: '34px',
+        fontWeight: 800,
       },
       h3: {
-        fontSize: '20px',
-        lineHeight: '28px',
-        fontWeight: 600,
+        fontSize: '28px',
+        lineHeight: '34px',
+        fontWeight: 700,
+      },
+      h4: {
+        fontSize: '22px',
+        lineHeight: '31px',
+        fontWeight: 900,
       },
     },
     body: {
-      fontSize: '16px',
-      lineHeight: '24px',
+      fontSize: '18px',
+      lineHeight: '32px',
       fontWeight: 400,
     },
     small: {

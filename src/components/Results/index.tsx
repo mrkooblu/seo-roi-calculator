@@ -164,7 +164,9 @@ const ResultsContainer = styled.div`
 `;
 
 const ResultsTitle = styled.h2`
-  font-size: ${({ theme }) => theme.typography.fontSize['3xl']};
+  font-size: ${({ theme }) => theme.typography.headings.h2.fontSize};
+  font-weight: ${({ theme }) => theme.typography.headings.h2.fontWeight};
+  line-height: ${({ theme }) => theme.typography.headings.h2.lineHeight};
   margin-bottom: ${({ theme }) => theme.spacing.xl};
   color: ${({ theme }) => theme.colors.text.primary};
   text-align: center;
@@ -209,7 +211,9 @@ const ChartContainer = styled.div`
 `;
 
 const SectionTitle = styled.h3`
-  font-size: ${({ theme }) => theme.typography.fontSize.xl};
+  font-size: ${({ theme }) => theme.typography.headings.h3.fontSize};
+  font-weight: ${({ theme }) => theme.typography.headings.h3.fontWeight};
+  line-height: ${({ theme }) => theme.typography.headings.h3.lineHeight};
   margin-bottom: ${({ theme }) => theme.spacing.md};
   color: ${({ theme }) => theme.colors.text.primary};
   

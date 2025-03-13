@@ -189,7 +189,9 @@ const BasicCalculatorContainer = styled.div`
 `;
 
 const FormTitle = styled.h2`
-  font-size: ${({ theme }) => theme.typography.fontSize.xl};
+  font-size: ${({ theme }) => theme.typography.headings.h2.fontSize};
+  font-weight: ${({ theme }) => theme.typography.headings.h2.fontWeight};
+  line-height: ${({ theme }) => theme.typography.headings.h2.lineHeight};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
   color: ${({ theme }) => theme.colors.text.primary};
 `;

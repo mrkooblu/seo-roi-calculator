@@ -141,10 +141,11 @@ const RecommendationContent = styled.div`
 `;
 
 const RecommendationTitle = styled.h4`
-  font-size: ${({ theme }) => theme.typography.fontSize.lg};
-  font-weight: ${({ theme }) => theme.typography.fontWeight.semiBold};
-  color: ${({ theme }) => theme.colors.primary};
+  font-size: ${({ theme }) => theme.typography.headings.h4.fontSize};
+  font-weight: ${({ theme }) => theme.typography.headings.h4.fontWeight};
+  line-height: ${({ theme }) => theme.typography.headings.h4.lineHeight};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
+  color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 const RecommendationDescription = styled.p`

@@ -36,6 +36,9 @@ class MyDocument extends Document {
           <meta charSet="UTF-8" />
           <meta name="description" content="Advanced SEO ROI Calculator - Calculate the return on investment for your SEO efforts" />
           <link rel="icon" href="/favicon.ico" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800;900&display=swap" rel="stylesheet" />
         </Head>
         <body>
           <Main />

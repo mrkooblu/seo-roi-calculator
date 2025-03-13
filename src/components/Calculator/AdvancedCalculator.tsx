@@ -72,8 +72,7 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
         <FormGroup
           id="organicCTR"
           label="Organic CTR (%)"
-          tooltip="The percentage of search impressions that result in clicks to your site"
-          helperText="Average is 3-5% for position #1"
+          tooltip="The percentage of search impressions that result in clicks to your site. Average is 27.6% for position #1, 15% for #2, 11% for #3."
           error={getFieldError('organicCTR')}
         >
           <InputGroup
@@ -82,7 +81,7 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             type="number"
             value={state.organicCTR || ''}
             onChange={handleInputChange}
-            placeholder="e.g. 3.5"
+            placeholder="e.g. 27.6"
             step="0.1"
             suffix="%"
             error={getFieldError('organicCTR')}
@@ -299,12 +298,13 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
 };
 
 const AdvancedCalculatorContainer = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
+  padding: ${({ theme }) => theme.spacing.md};
 `;
 
-const FormTitle = styled.h3`
-  font-size: ${({ theme }) => theme.typography.fontSize.xl};
-  font-weight: ${({ theme }) => theme.typography.fontWeight.semiBold};
+const FormTitle = styled.h2`
+  font-size: ${({ theme }) => theme.typography.headings.h2.fontSize};
+  font-weight: ${({ theme }) => theme.typography.headings.h2.fontWeight};
+  line-height: ${({ theme }) => theme.typography.headings.h2.lineHeight};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
   color: ${({ theme }) => theme.colors.text.primary};
 `;
@@ -333,8 +333,12 @@ const InvestmentNote = styled.p`
 
 const FormGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: ${({ theme }) => theme.spacing.lg};
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: ${({ theme }) => theme.spacing.md};
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const Select = styled.select`

@@ -11,8 +11,8 @@ const GlobalStyle = createGlobalStyle`
   html,
   body {
     font-family: ${theme.typography.fontFamily};
-    font-size: ${theme.typography.fontSize.base};
-    line-height: 1.5;
+    font-size: ${theme.typography.body.fontSize};
+    line-height: ${theme.typography.body.lineHeight};
     color: ${theme.colors.text.primary};
     background-color: ${theme.colors.background};
     -webkit-font-smoothing: antialiased;
@@ -21,36 +21,47 @@ const GlobalStyle = createGlobalStyle`
 
   h1, h2, h3, h4, h5, h6 {
     margin-bottom: ${theme.spacing.md};
-    font-weight: ${theme.typography.fontWeight.bold};
     line-height: 1.2;
   }
 
   h1 {
-    font-size: ${theme.typography.fontSize['4xl']};
+    font-size: ${theme.typography.headings.h1.fontSize};
+    font-weight: ${theme.typography.headings.h1.fontWeight};
+    line-height: ${theme.typography.headings.h1.lineHeight};
   }
 
   h2 {
-    font-size: ${theme.typography.fontSize['3xl']};
+    font-size: ${theme.typography.headings.h2.fontSize};
+    font-weight: ${theme.typography.headings.h2.fontWeight};
+    line-height: ${theme.typography.headings.h2.lineHeight};
   }
 
   h3 {
-    font-size: ${theme.typography.fontSize.xxl};
+    font-size: ${theme.typography.headings.h3.fontSize};
+    font-weight: ${theme.typography.headings.h3.fontWeight};
+    line-height: ${theme.typography.headings.h3.lineHeight};
   }
 
   h4 {
-    font-size: ${theme.typography.fontSize.xl};
+    font-size: ${theme.typography.headings.h4.fontSize};
+    font-weight: ${theme.typography.headings.h4.fontWeight};
+    line-height: ${theme.typography.headings.h4.lineHeight};
   }
 
   h5 {
     font-size: ${theme.typography.fontSize.lg};
+    font-weight: ${theme.typography.fontWeight.semiBold};
   }
 
   h6 {
     font-size: ${theme.typography.fontSize.base};
+    font-weight: ${theme.typography.fontWeight.semiBold};
   }
 
   p {
     margin-bottom: ${theme.spacing.md};
+    font-size: ${theme.typography.body.fontSize};
+    line-height: ${theme.typography.body.lineHeight};
   }
 
   a {

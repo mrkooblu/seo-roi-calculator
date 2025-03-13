@@ -137,6 +137,7 @@ const TooltipContent = styled.div<TooltipContentProps>`
   padding: 10px 14px;
   border-radius: ${({ theme }) => theme.borderRadius.md};
   font-size: 13px;
+  line-height: 1.4;
   width: max-content;
   max-width: ${({ $maxWidth }) => `${$maxWidth}px`};
   text-align: left;
