@@ -11,6 +11,9 @@ interface AdvancedCalculatorProps {
 }
 
 const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateState, getFieldError }) => {
+  const [domainInput, setDomainInput] = React.useState('');
+  const [keywordInput, setKeywordInput] = React.useState('');
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
@@ -21,6 +24,32 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
       }
     } else {
       updateState({ [name]: value });
+    }
+  };
+
+  const handleDomainCheck = () => {
+    if (domainInput) {
+      window.open(`https://www.semrush.com/analytics/overview/?searchType=domain&q=${encodeURIComponent(domainInput)}`, '_blank');
+    }
+  };
+
+  const handleKeywordAnalyze = () => {
+    if (keywordInput) {
+      window.open(`https://www.semrush.com/analytics/keywordoverview/?q=${encodeURIComponent(keywordInput)}&db=us`, '_blank');
+    }
+  };
+
+  const handleDomainKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleDomainCheck();
+    }
+  };
+
+  const handleKeywordKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleKeywordAnalyze();
     }
   };
 
@@ -168,6 +197,54 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             <option value="local">Local Business</option>
             <option value="other">Other</option>
           </Select>
+        </FormGroup>
+        
+        {/* Domain Authority Section with Semrush Integration */}
+        <FormGroup
+          id="domainAuthority"
+          label="Domain Authority"
+          tooltip="Check your domain's authority score and get insights from Semrush"
+          helperText="Understanding your domain's authority can help set realistic growth expectations and identify improvement opportunities."
+        >
+          <DomainAuthorityWrapper>
+            <DomainInput
+              type="text"
+              placeholder="Enter your domain"
+              value={domainInput}
+              onChange={(e) => setDomainInput(e.target.value)}
+              onKeyDown={handleDomainKeyDown}
+            />
+            <AuthorityButton
+              type="button"
+              onClick={handleDomainCheck}
+            >
+              Check
+            </AuthorityButton>
+          </DomainAuthorityWrapper>
+        </FormGroup>
+        
+        {/* Keyword Research Section with Semrush Integration */}
+        <FormGroup
+          id="keywordResearch"
+          label="Keyword Research"
+          tooltip="Analyze keyword metrics and competition using Semrush"
+          helperText="Research keywords to understand search volume, difficulty, and competitive landscape."
+        >
+          <KeywordResearchWrapper>
+            <KeywordInput
+              type="text"
+              placeholder="Enter keyword"
+              value={keywordInput}
+              onChange={(e) => setKeywordInput(e.target.value)}
+              onKeyDown={handleKeywordKeyDown}
+            />
+            <AnalyzeButton
+              type="button"
+              onClick={handleKeywordAnalyze}
+            >
+              Analyze
+            </AnalyzeButton>
+          </KeywordResearchWrapper>
         </FormGroup>
       </FormGrid>
       
@@ -336,6 +413,91 @@ const Select = styled.select`
     outline: none;
     border-color: ${({ theme }) => theme.colors.primary};
     box-shadow: 0 0 0 2px ${({ theme }) => `${theme.colors.primary}33`};
+  }
+`;
+
+const DomainAuthorityWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacing.sm};
+  width: 100%;
+`;
+
+const DomainInput = styled.input`
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  color: ${({ theme }) => theme.colors.text.primary};
+  background-color: white;
+  transition: ${({ theme }) => theme.transitions.default};
+  width: calc(100% - 80px); /* Increase input field size by reducing button space */
+  
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => `${theme.colors.primary}33`};
+  }
+`;
+
+const AuthorityButton = styled.button`
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  border: none;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  color: white;
+  background-color: ${({ theme }) => theme.colors.primary};
+  transition: ${({ theme }) => theme.transitions.default};
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+  min-width: 70px; /* Make the button smaller */
+  
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primaryHover};
+  }
+`;
+
+// Keyword Research styled components - mirroring the Domain Authority styles
+const KeywordResearchWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacing.sm};
+  width: 100%;
+`;
+
+const KeywordInput = styled.input`
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  color: ${({ theme }) => theme.colors.text.primary};
+  background-color: white;
+  transition: ${({ theme }) => theme.transitions.default};
+  width: calc(100% - 80px); /* Increase input field size by reducing button space */
+  
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => `${theme.colors.primary}33`};
+  }
+`;
+
+const AnalyzeButton = styled.button`
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  border: none;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  color: white;
+  background-color: ${({ theme }) => theme.colors.primary};
+  transition: ${({ theme }) => theme.transitions.default};
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+  min-width: 80px; /* Make the button smaller */
+  
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primaryHover};
   }
 `;
 

@@ -18,8 +18,14 @@ const Recommendations: React.FC<RecommendationsProps> = ({ recommendations }) =>
     if (title.includes('Strategy Overview')) {
       return {
         url: 'https://www.semrush.com/signup/',
-        text: 'Try SEMrush',
+        text: 'Try Semrush',
         color: '#ff642e' // Orange
+      };
+    } else if (title.includes('Growing Site Strategy')) {
+      return {
+        url: 'https://www.semrush.com/content-marketing/get-started/',
+        text: 'Content Marketing Toolkit',
+        color: '#4285f4' // Blue
       };
     } else if (title.includes('Conversion Rate')) {
       return {
