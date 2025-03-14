@@ -26,7 +26,6 @@ const Results: React.FC<ResultsProps> = ({ results, timeframe }) => {
   const { 
     initialRevenue,
     projectedRevenue,
-    revenueIncrease,
     averageMonthlyIncrease,
     totalSEOCost,
     roi,
