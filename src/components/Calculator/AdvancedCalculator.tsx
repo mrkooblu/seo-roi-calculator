@@ -70,25 +70,6 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
         </FormGroup>
         
         <FormGroup
-          id="organicCTR"
-          label="Organic CTR (%)"
-          tooltip="The percentage of search impressions that result in clicks to your site. Average is 27.6% for position #1, 15% for #2, 11% for #3."
-          error={getFieldError('organicCTR')}
-        >
-          <InputGroup
-            id="organicCTR"
-            name="organicCTR"
-            type="number"
-            value={state.organicCTR || ''}
-            onChange={handleInputChange}
-            placeholder="e.g. 27.6"
-            step="0.1"
-            suffix="%"
-            error={getFieldError('organicCTR')}
-          />
-        </FormGroup>
-        
-        <FormGroup
           id="conversionRate"
           label="Conversion Rate (%)"
           tooltip="The percentage of visitors who complete a desired action"

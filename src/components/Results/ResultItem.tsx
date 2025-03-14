@@ -1,5 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
+import Tooltip from '../Form/Tooltip';
+import { FiInfo } from 'react-icons/fi';
 
 interface ResultItemProps {
   title: string;
@@ -8,11 +10,13 @@ interface ResultItemProps {
   prefix?: string;
   suffix?: string;
   isPositive?: boolean;
+  tooltip?: string;
 }
 
 /**
  * ResultItem displays a single metric in the results section
  * It can be highlighted and show positive/negative values with appropriate styling
+ * Now includes optional tooltip for additional context
  */
 const ResultItem: React.FC<ResultItemProps> = ({ 
   title, 
@@ -20,11 +24,21 @@ const ResultItem: React.FC<ResultItemProps> = ({
   highlight = false,
   prefix,
   suffix,
-  isPositive
+  isPositive,
+  tooltip
 }) => {
   return (
     <MetricCard $highlight={highlight}>
-      <MetricTitle>{title}</MetricTitle>
+      <MetricTitleWrapper>
+        <MetricTitle>{title}</MetricTitle>
+        {tooltip && (
+          <TooltipWrapper>
+            <Tooltip content={tooltip} position="top">
+              <InfoIcon />
+            </Tooltip>
+          </TooltipWrapper>
+        )}
+      </MetricTitleWrapper>
       <MetricValueWrapper>
         {prefix && <MetricPrefix>{prefix}</MetricPrefix>}
         <MetricValue>{value}</MetricValue>
@@ -70,6 +84,12 @@ const MetricCard = styled.div<MetricCardProps>`
   }
 `;
 
+const MetricTitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const MetricTitle = styled.h3`
   font-size: ${({ theme }) => theme.typography.fontSize.base};
   font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
@@ -107,6 +127,18 @@ const ChangeIndicator = styled.div<ChangeIndicatorProps>`
     $isPositive ? theme.colors.success : theme.colors.danger};
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
   font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+`;
+
+const TooltipWrapper = styled.div`
+  margin-left: ${({ theme }) => theme.spacing.sm};
+`;
+
+const InfoIcon = styled(FiInfo)`
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  &:hover {
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
 `;
 
 export default ResultItem; 

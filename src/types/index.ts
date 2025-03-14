@@ -8,7 +8,6 @@ export interface CalculatorState {
   monthlySEOCost: number;
   
   // Advanced calculator inputs
-  organicCTR: number;
   keywordDifficulty: number;
   competitionLevel: 'low' | 'medium' | 'high';
   industryType: 'ecommerce' | 'saas' | 'local' | 'other';
@@ -25,6 +24,7 @@ export interface CalculationResults {
   initialRevenue: number;
   projectedRevenue: number;
   revenueIncrease: number;
+  averageMonthlyIncrease: number; // Average revenue increase per month across the timeframe
   totalSEOCost: number;
   roi: number;
   breakEvenMonth: number;

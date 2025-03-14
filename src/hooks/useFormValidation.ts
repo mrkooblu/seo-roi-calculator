@@ -43,17 +43,9 @@ const useFormValidation = () => {
     }
     
     // Validate advanced calculator inputs
-    if (state.organicCTR !== undefined) {
-      if (state.organicCTR <= 0) {
-        newErrors.organicCTR = 'Organic CTR must be greater than 0';
-      } else if (state.organicCTR > 100) {
-        newErrors.organicCTR = 'Organic CTR cannot exceed 100%';
-      }
-    }
-    
     if (state.keywordDifficulty !== undefined) {
-      if (state.keywordDifficulty < 0) {
-        newErrors.keywordDifficulty = 'Keyword difficulty cannot be negative';
+      if (state.keywordDifficulty < 1) {
+        newErrors.keywordDifficulty = 'Keyword difficulty must be at least 1';
       } else if (state.keywordDifficulty > 100) {
         newErrors.keywordDifficulty = 'Keyword difficulty cannot exceed 100';
       }

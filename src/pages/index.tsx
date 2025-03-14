@@ -14,7 +14,8 @@ const Home: React.FC = () => {
           name="description"
           content="Calculate the return on investment (ROI) of your SEO efforts with our advanced SEO ROI calculator."
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, minimum-scale=1" />
+        <meta name="theme-color" content="#4F46E5" />
       </Head>
 
       <Main>

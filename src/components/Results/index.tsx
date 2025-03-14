@@ -15,17 +15,19 @@ const formatNumber = (value: number): string => {
 
 interface ResultsProps {
   results: CalculationResults;
+  timeframe: number; // Add timeframe prop to get access to the current timeframe
 }
 
 /**
  * Results component displays the calculation results with metrics, charts, and recommendations
  * It uses animation and visually highlights important metrics
  */
-const Results: React.FC<ResultsProps> = ({ results }) => {
+const Results: React.FC<ResultsProps> = ({ results, timeframe }) => {
   const { 
     initialRevenue,
     projectedRevenue,
     revenueIncrease,
+    averageMonthlyIncrease,
     totalSEOCost,
     roi,
     breakEvenMonth,
@@ -44,26 +46,30 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
           title="Initial Monthly Revenue"
           value={formatNumber(initialRevenue)}
           prefix="$"
+          tooltip="Your current monthly revenue based on existing traffic and conversion rate"
         />
         
         <ResultItem 
-          title="Projected Monthly Revenue"
+          title="Target Monthly Revenue"
           value={formatNumber(projectedRevenue)}
           prefix="$"
           isPositive={projectedRevenue > initialRevenue}
+          tooltip={`The projected monthly revenue you can expect to achieve by the end of month ${timeframe}, after reaching your target traffic`}
         />
         
         <ResultItem 
-          title="Monthly Revenue Increase"
-          value={formatNumber(revenueIncrease)}
+          title="Average Monthly Increase"
+          value={formatNumber(averageMonthlyIncrease)}
           prefix="$"
-          isPositive={revenueIncrease > 0}
+          isPositive={averageMonthlyIncrease > 0}
+          tooltip="The average monthly revenue increase you can expect over the entire timeframe"
         />
         
         <ResultItem 
           title="Total SEO Investment"
           value={formatNumber(totalSEOCost)}
           prefix="$"
+          tooltip={`Your total investment in SEO over ${timeframe} months`}
         />
         
         <ResultItem 
@@ -72,11 +78,13 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
           suffix="%"
           highlight={true}
           isPositive={roi > 0}
+          tooltip={`Your total return on investment over the ${timeframe}-month period`}
         />
         
         <ResultItem 
           title="Break-even Month"
           value={breakEvenMonth.toString()}
+          tooltip="The month when your cumulative additional revenue exceeds your cumulative SEO costs"
         />
       </ResultsGrid>
 
@@ -85,7 +93,7 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
           <SectionTitle>Traffic Growth Projection</SectionTitle>
           <CustomTooltipWrapper>
             <Tooltip 
-              content="Visualizes your organic traffic growth over time, calculated using S-curve modeling that accounts for typical SEO momentum patterns."
+              content="Visualizes your organic traffic growth over time, calculated using S-curve modeling that accounts for typical SEO momentum patterns. Note that real growth will take time, especially for newer sites."
               position="right"
             >
               <ChartInfoIcon />
@@ -95,6 +103,7 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
         <ChartContainer>
           <ROIChart data={trafficGrowthChart} />
         </ChartContainer>
+        <ChartNote>SEO results take time, with slower growth in the early months and acceleration later</ChartNote>
       </ChartSection>
       
       <ChartSection>
@@ -102,7 +111,7 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
           <SectionTitle>Revenue Growth Projection</SectionTitle>
           <CustomTooltipWrapper>
             <Tooltip 
-              content="Shows how your revenue is expected to grow as traffic and conversions increase, incorporating time-based conversion rate maturation."
+              content="Shows how your revenue is expected to grow as traffic and conversions increase. Your 'Final Monthly Revenue' represents the last bar in this chart."
               position="right"
             >
               <ChartInfoIcon />
@@ -112,6 +121,7 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
         <ChartContainer>
           <ROIChart data={revenueGrowthChart} />
         </ChartContainer>
+        <ChartNote>Revenue follows the same growth pattern as traffic - gradual at first, then accelerating</ChartNote>
       </ChartSection>
       
       <ChartSection>
@@ -129,6 +139,7 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
         <ChartContainer>
           <ROIChart data={roiComparisonChart} />
         </ChartContainer>
+        <ChartNote>Break-even occurs when the blue bars (cumulative revenue) exceed the red bars (cumulative cost)</ChartNote>
       </ChartSection>
 
       <RecommendationsSection>
@@ -204,6 +215,14 @@ const ChartContainer = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
   box-shadow: ${({ theme }) => theme.shadows.sm};
   transition: box-shadow 0.3s ease;
+  min-height: 400px; /* Ensure consistent height */
+  width: 100%;
+  
+  /* Improve resolution with better rendering for charts */
+  canvas {
+    image-rendering: high-quality;
+    image-rendering: -webkit-optimize-contrast; /* For Webkit browsers */
+  }
   
   &:hover {
     box-shadow: ${({ theme }) => theme.shadows.md};
@@ -272,6 +291,13 @@ const ChartInfoIcon = styled(FiInfo)`
 
 const RecommendationsSection = styled.div`
   margin-top: ${({ theme }) => theme.spacing.xl};
+`;
+
+const ChartNote = styled.p`
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin-top: ${({ theme }) => theme.spacing.md};
+  text-align: center;
 `;
 
 export default Results; 

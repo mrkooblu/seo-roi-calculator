@@ -107,7 +107,7 @@ const Calculator: React.FC = () => {
       
       {results && !isCalculating && (
         <div id="results-section">
-          <Results results={results} />
+          <Results results={results} timeframe={state.timeframe} />
         </div>
       )}
     </CalculatorWrapper>
