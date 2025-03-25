@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { CalculationResults } from '../../types';
 import ROIChart from './ROIChart';
+import SemrushModule from './SemrushModule';
 import Recommendations from './Recommendations';
 import ResultItem from './ResultItem';
 import Tooltip from '../Form/Tooltip';
@@ -37,115 +38,119 @@ const Results: React.FC<ResultsProps> = ({ results, timeframe }) => {
   } = results;
 
   return (
-    <ResultsContainer>
-      <ResultsTitle>Your SEO ROI Results</ResultsTitle>
-      
-      <ResultsGrid>
-        <ResultItem 
-          title="Initial Monthly Revenue"
-          value={formatNumber(initialRevenue)}
-          prefix="$"
-          tooltip="Your current monthly revenue based on existing traffic and conversion rate"
-        />
+    <>
+      <ResultsContainer>
+        <ResultsTitle>Your SEO ROI Results</ResultsTitle>
         
-        <ResultItem 
-          title="Target Monthly Revenue"
-          value={formatNumber(projectedRevenue)}
-          prefix="$"
-          isPositive={projectedRevenue > initialRevenue}
-          tooltip={`The projected monthly revenue you can expect to achieve by the end of month ${timeframe}, after reaching your target traffic`}
-        />
-        
-        <ResultItem 
-          title="Average Monthly Increase"
-          value={formatNumber(averageMonthlyIncrease)}
-          prefix="$"
-          isPositive={averageMonthlyIncrease > 0}
-          tooltip="The average monthly revenue increase you can expect over the entire timeframe"
-        />
-        
-        <ResultItem 
-          title="Total SEO Investment"
-          value={formatNumber(totalSEOCost)}
-          prefix="$"
-          tooltip={`Your total investment in SEO over ${timeframe} months`}
-        />
-        
-        <ResultItem 
-          title="Return on Investment"
-          value={formatNumber(roi)}
-          suffix="%"
-          highlight={true}
-          isPositive={roi > 0}
-          tooltip={`Your total return on investment over the ${timeframe}-month period`}
-        />
-        
-        <ResultItem 
-          title="Break-even Month"
-          value={breakEvenMonth.toString()}
-          tooltip="The month when your cumulative additional revenue exceeds your cumulative SEO costs"
-        />
-      </ResultsGrid>
+        <ResultsGrid>
+          <ResultItem 
+            title="Initial Monthly Revenue"
+            value={formatNumber(initialRevenue)}
+            prefix="$"
+            tooltip="Your current monthly revenue based on existing traffic and conversion rate"
+          />
+          
+          <ResultItem 
+            title="Target Monthly Revenue"
+            value={formatNumber(projectedRevenue)}
+            prefix="$"
+            isPositive={projectedRevenue > initialRevenue}
+            tooltip={`The projected monthly revenue you can expect to achieve by the end of month ${timeframe}, after reaching your target traffic`}
+          />
+          
+          <ResultItem 
+            title="Average Monthly Increase"
+            value={formatNumber(averageMonthlyIncrease)}
+            prefix="$"
+            isPositive={averageMonthlyIncrease > 0}
+            tooltip="The average monthly revenue increase you can expect over the entire timeframe"
+          />
+          
+          <ResultItem 
+            title="Total SEO Investment"
+            value={formatNumber(totalSEOCost)}
+            prefix="$"
+            tooltip={`Your total investment in SEO over ${timeframe} months`}
+          />
+          
+          <ResultItem 
+            title="Return on Investment"
+            value={formatNumber(roi)}
+            suffix="%"
+            highlight={true}
+            isPositive={roi > 0}
+            tooltip={`Your total return on investment over the ${timeframe}-month period`}
+          />
+          
+          <ResultItem 
+            title="Break-even Month"
+            value={breakEvenMonth.toString()}
+            tooltip="The month when your cumulative additional revenue exceeds your cumulative SEO costs"
+          />
+        </ResultsGrid>
 
-      <ChartSection>
-        <SectionTitleWrapper>
-          <SectionTitle>Traffic Growth Projection</SectionTitle>
-          <CustomTooltipWrapper>
-            <Tooltip 
-              content="Visualizes your organic traffic growth over time, calculated using S-curve modeling that accounts for typical SEO momentum patterns. Note that real growth will take time, especially for newer sites."
-              position="right"
-            >
-              <ChartInfoIcon />
-            </Tooltip>
-          </CustomTooltipWrapper>
-        </SectionTitleWrapper>
-        <ChartContainer>
-          <ROIChart data={trafficGrowthChart} />
-        </ChartContainer>
-        <ChartNote>SEO results take time, with slower growth in the early months and acceleration later</ChartNote>
-      </ChartSection>
-      
-      <ChartSection>
-        <SectionTitleWrapper>
-          <SectionTitle>Revenue Growth Projection</SectionTitle>
-          <CustomTooltipWrapper>
-            <Tooltip 
-              content="Shows how your revenue is expected to grow as traffic and conversions increase. Your 'Final Monthly Revenue' represents the last bar in this chart."
-              position="right"
-            >
-              <ChartInfoIcon />
-            </Tooltip>
-          </CustomTooltipWrapper>
-        </SectionTitleWrapper>
-        <ChartContainer>
-          <ROIChart data={revenueGrowthChart} />
-        </ChartContainer>
-        <ChartNote>Revenue follows the same growth pattern as traffic - gradual at first, then accelerating</ChartNote>
-      </ChartSection>
-      
-      <ChartSection>
-        <SectionTitleWrapper>
-          <SectionTitle>ROI Comparison</SectionTitle>
-          <CustomTooltipWrapper>
-            <Tooltip 
-              content="Compares your cumulative investment against returns over time, showing the point where your SEO efforts become profitable."
-              position="right"
-            >
-              <ChartInfoIcon />
-            </Tooltip>
-          </CustomTooltipWrapper>
-        </SectionTitleWrapper>
-        <ChartContainer>
-          <ROIChart data={roiComparisonChart} />
-        </ChartContainer>
-        <ChartNote>Break-even occurs when the blue bars (cumulative revenue) exceed the red bars (cumulative cost)</ChartNote>
-      </ChartSection>
+        <ChartSection>
+          <SectionTitleWrapper>
+            <SectionTitle>Traffic Growth Projection</SectionTitle>
+            <CustomTooltipWrapper>
+              <Tooltip 
+                content="Visualizes your organic traffic growth over time, calculated using S-curve modeling that accounts for typical SEO momentum patterns. Note that real growth will take time, especially for newer sites."
+                position="right"
+              >
+                <ChartInfoIcon />
+              </Tooltip>
+            </CustomTooltipWrapper>
+          </SectionTitleWrapper>
+          <ChartContainer>
+            <ROIChart data={trafficGrowthChart} />
+          </ChartContainer>
+          <ChartNote>SEO results take time, with slower growth in the early months and acceleration later</ChartNote>
+        </ChartSection>
+        
+        <ChartSection>
+          <SectionTitleWrapper>
+            <SectionTitle>Revenue Growth Projection</SectionTitle>
+            <CustomTooltipWrapper>
+              <Tooltip 
+                content="Shows how your revenue is expected to grow as traffic and conversions increase. Your 'Final Monthly Revenue' represents the last bar in this chart."
+                position="right"
+              >
+                <ChartInfoIcon />
+              </Tooltip>
+            </CustomTooltipWrapper>
+          </SectionTitleWrapper>
+          <ChartContainer>
+            <ROIChart data={revenueGrowthChart} />
+          </ChartContainer>
+          <ChartNote>Revenue follows the same growth pattern as traffic - gradual at first, then accelerating</ChartNote>
+        </ChartSection>
+        
+        <ChartSection>
+          <SectionTitleWrapper>
+            <SectionTitle>ROI Comparison</SectionTitle>
+            <CustomTooltipWrapper>
+              <Tooltip 
+                content="Compares your cumulative investment against returns over time, showing the point where your SEO efforts become profitable."
+                position="right"
+              >
+                <ChartInfoIcon />
+              </Tooltip>
+            </CustomTooltipWrapper>
+          </SectionTitleWrapper>
+          <ChartContainer>
+            <ROIChart data={roiComparisonChart} />
+          </ChartContainer>
+          <ChartNote>Break-even occurs when the blue bars (cumulative revenue) exceed the red bars (cumulative cost)</ChartNote>
+        </ChartSection>
 
-      <RecommendationsSection>
-        <SectionTitle>Recommendations</SectionTitle>
-        <Recommendations recommendations={recommendations} />
-      </RecommendationsSection>
-    </ResultsContainer>
+        <RecommendationsSection>
+          <SectionTitle>Recommendations</SectionTitle>
+          <Recommendations recommendations={recommendations} />
+        </RecommendationsSection>
+      </ResultsContainer>
+      
+      <SemrushModule />
+    </>
   );
 };
 
@@ -243,49 +248,26 @@ const SectionTitle = styled.h3`
 const SectionTitleWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: ${({ theme }) => theme.spacing.md};
+  gap: 8px;
+  margin-bottom: 16px;
+
+  h3 {
+    margin: 0; // Remove default margin from the title
+    line-height: 1; // Ensure consistent line height
+  }
 `;
 
 const CustomTooltipWrapper = styled.div`
   display: inline-flex;
   align-items: center;
-  margin-left: 6px;
-  line-height: 1;
-  
-  /* Ensure vertical alignment */
-  position: relative;
-  top: 1px;
-  
-  /* Override tooltip content styling */
-  div[role="tooltip"] {
-    background-color: #EBF3FF;
-    color: black;
-    font-weight: 400;
-  }
-  
-  /* Override tooltip arrow styling */
-  div[role="tooltip"] > div {
-    border-color: transparent;
-    &[class*="right"] {
-      border-right-color: #EBF3FF;
-    }
-    &[class*="top"] {
-      border-top-color: #EBF3FF;
-    }
-    &[class*="bottom"] {
-      border-bottom-color: #EBF3FF;
-    }
-    &[class*="left"] {
-      border-left-color: #EBF3FF;
-    }
-  }
+  height: 24px; // Match the approximate height of the title
 `;
 
 const ChartInfoIcon = styled(FiInfo)`
-  width: 18px;
-  height: 18px;
-  color: ${({ theme }) => theme.colors.primary};
-  display: block; /* Ensures no extra spacing */
+  color: #64748b;
+  cursor: help;
+  width: 20px;
+  height: 20px;
 `;
 
 const RecommendationsSection = styled.div`
