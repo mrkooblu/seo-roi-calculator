@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "CI=false npm install && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -10,10 +10,16 @@
   # Set ESLint to not fail on errors
   ESLINT_NO_DEV_ERRORS = "true"
   NEXT_DISABLE_ESLINT = "true"
+  # Increase Node.js memory limit for better build performance
+  NODE_OPTIONS = "--max_old_space_size=4096"
   
 [build.processing]
   skip_processing = true
 
 # Ensure Next.js specific build steps
 [[plugins]]
-  package = "@netlify/plugin-nextjs" 
+  package = "@netlify/plugin-nextjs"
+
+# Cache Next.js build files for faster builds
+[[plugins]]
+  package = "netlify-plugin-cache-nextjs" 
