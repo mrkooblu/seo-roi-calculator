@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     // Disable TypeScript type checking during production build
     ignoreBuildErrors: true,
   },
+  // Ensure packages are properly transpiled
+  transpilePackages: ["tailwindcss", "postcss", "autoprefixer"],
   // Other options can remain the same
 };
 
