@@ -15,6 +15,49 @@ import {
   TooltipItem
 } from 'chart.js';
 import { ChartData } from '../../types';
+import annotationPlugin from 'chartjs-plugin-annotation';
+
+// Define custom annotation options type for our specific chart
+type ChartAnnotations = {
+  breakEvenLine?: {
+    type: 'line';
+    xMin: number;
+    xMax: number;
+    borderColor: string;
+    borderWidth: number;
+    borderDash: number[];
+    label: {
+      display: boolean;
+      content: string;
+      position: 'start';
+      backgroundColor: string;
+      font: {
+        size: number;
+        weight: 'bold';
+      };
+      yAdjust: number;
+      xAdjust: number;
+      padding: number;
+    };
+  };
+  breakEvenBox?: {
+    type: 'box';
+    xMin: number;
+    xMax: number;
+    yMin: number;
+    yMax: string | number;
+    backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+  };
+  breakEvenPoint?: {
+    type: 'point';
+    xValue: number;
+    yValue: number;
+    backgroundColor: string;
+    radius: number;
+  };
+};
 
 // Register ChartJS components
 ChartJS.register(
@@ -27,7 +70,8 @@ ChartJS.register(
   LineController, // Add explicit controller registration
   Title,
   Tooltip,
-  Legend
+  Legend,
+  annotationPlugin // Register annotation plugin for break-even indicator
 );
 
 // Set default options for all charts to improve rendering quality
@@ -46,9 +90,15 @@ const formatNumber = (value: number): string => {
 
 interface ChartComponentProps {
   data: ChartData;
+  breakEvenMonth?: number; // New prop for break-even point indicator
+  chartType?: string; // Chart type identifier to apply specific configurations
 }
 
-const ChartComponent: React.FC<ChartComponentProps> = ({ data }) => {
+const ChartComponent: React.FC<ChartComponentProps> = ({ 
+  data, 
+  breakEvenMonth,
+  chartType 
+}) => {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -70,6 +120,76 @@ const ChartComponent: React.FC<ChartComponentProps> = ({ data }) => {
   const isTrafficChart = processedData.datasets.some(
     dataset => dataset.label?.toLowerCase().includes('traffic')
   );
+
+  // Check if this is ROI comparison chart
+  const isROIComparisonChart = chartType === 'roiComparison' || 
+    processedData.datasets.some(dataset => dataset.label?.toLowerCase().includes('roi'));
+
+  // Create annotation configuration if this is an ROI comparison chart
+  const annotationConfig = isROIComparisonChart && breakEvenMonth && breakEvenMonth <= data.labels.length ? {
+    annotation: {
+      annotations: {
+        breakEvenLine: {
+          type: 'line' as const,
+          xMin: breakEvenMonth - 0.5, // Adjust for half-bar width
+          xMax: breakEvenMonth - 0.5,
+          borderColor: 'rgba(255, 99, 132, 0.8)',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          label: {
+            display: true,
+            content: `Break-even: Month ${breakEvenMonth}`,
+            position: 'start' as const,
+            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+            font: {
+              size: 12,
+              weight: 'bold' as const
+            },
+            yAdjust: -15,
+            xAdjust: 0,
+            padding: 6
+          }
+        },
+        breakEvenBox: {
+          type: 'box' as const,
+          xMin: Math.floor(breakEvenMonth) - 1,
+          xMax: Math.ceil(breakEvenMonth) - 1,
+          yMin: 0,
+          yMax: 'max',
+          backgroundColor: 'rgba(255, 255, 0, 0.08)',
+          borderColor: 'rgba(255, 99, 132, 0.3)',
+          borderWidth: 1
+        },
+        breakEvenPoint: {
+          type: 'point' as const,
+          xValue: breakEvenMonth - 1,
+          yValue: 0, // Will be dynamically set based on data
+          backgroundColor: 'rgba(255, 99, 132, 1)',
+          radius: 6
+        }
+      } as ChartAnnotations
+    }
+  } : {};
+
+  // Find max value for the break-even point indicator (if applicable)
+  if (isROIComparisonChart && breakEvenMonth && annotationConfig.annotation) {
+    // Find the maximum value in the datasets to position the break-even indicator
+    let maxValue = 0;
+    data.datasets.forEach(dataset => {
+      if (dataset.yAxisID !== 'y1') { // Exclude percentage datasets
+        const datasetMax = Math.max(...(dataset.data as number[])); 
+        if (datasetMax > maxValue) {
+          maxValue = datasetMax;
+        }
+      }
+    });
+    
+    // Position the break-even point at a percentage of the max height
+    const annotations = annotationConfig.annotation.annotations as ChartAnnotations;
+    if (annotations.breakEvenPoint) {
+      annotations.breakEvenPoint.yValue = maxValue * 0.85;
+    }
+  }
 
   // Fixed TypeScript type issues in the options
   const options = {
@@ -197,7 +317,9 @@ const ChartComponent: React.FC<ChartComponentProps> = ({ data }) => {
             return label;
           }
         }
-      }
+      },
+      // Add annotation configuration if available
+      ...(annotationConfig.annotation ? { annotation: annotationConfig.annotation } : {})
     }
   };
 

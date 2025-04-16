@@ -1,5 +1,6 @@
 import { CalculatorInputs, AdvancedCalculatorInputs, CompetitionLevel } from '../types/calculator';
 import { CalculationResults, ChartDataPoint, RecommendationItem } from '../types/results';
+import { CalculatorState } from '../types';
 
 // Define a type for extended inputs that might be cast from basic inputs
 type ExtendedInputsProps = {
@@ -270,53 +271,151 @@ export const calculateAdvancedROI = (
 };
 
 /**
- * Generates chart data for ROI visualization
- * Enhanced with S-curve growth models and ramp-up periods
+ * Generate chart data points for visualization based on calculator inputs
  */
-export const generateChartData = (
-  timePeriod: number,
-  monthlyCost: number,
-  monthlyProfit: number
-): ChartDataPoint[] => {
-  const chartData: ChartDataPoint[] = [];
+export interface VisualizationChartDataPoint {
+  month: number;
+  monthlyTraffic: number;
+  monthlyAdditionalTraffic: number;
+  monthlyCost: number;
+  monthlyAdditionalRevenue: number;
+  cumulativeCost: number;
+  cumulativeAdditionalRevenue: number;
+  cumulativeROI: number;
+}
 
-  let cumulativeInvestment = 0;
-  let cumulativeProfit = 0;
+/**
+ * Generates chart data for visualization based on calculator inputs
+ */
+export function generateChartData(state: {
+  currentTraffic: number;
+  targetTraffic: number;
+  conversionRate: number;
+  averageOrderValue: number;
+  monthlyCost: number;
+  projectLength: number;
+  domainAuthority: number;
+  competitionLevel: CompetitionLevel;
+  industryType: string;
+}): VisualizationChartDataPoint[] {
+  const {
+    currentTraffic,
+    targetTraffic,
+    conversionRate,
+    averageOrderValue,
+    monthlyCost,
+    projectLength,
+    domainAuthority,
+    competitionLevel,
+    industryType
+  } = state;
   
-  // Growth curve parameters
-  const growthRate = 0.3; // Growth rate parameter 
-  const midpoint = timePeriod / 2; // Midpoint of growth curve
-  const rampUpPeriod = 3; // Months to reach significant results
-
-  for (let i = 1; i <= timePeriod; i++) {
-    cumulativeInvestment += monthlyCost;
+  // Calculate growth rate factors based on competition and domain metrics
+  let growthFactor = 0.2; // Default growth rate
+  
+  // Adjust growth factor based on domain authority
+  if (domainAuthority < 20) {
+    growthFactor *= 0.8;
+  } else if (domainAuthority > 50) {
+    growthFactor *= 1.3;
+  }
+  
+  // Adjust growth factor based on competition level
+  if (competitionLevel === 'low') {
+    growthFactor *= 1.3;
+  } else if (competitionLevel === 'high') {
+    growthFactor *= 0.7;
+  }
+  
+  // Adjust growth factor based on industry type
+  if (industryType === 'e-commerce' || industryType === 'saas') {
+    growthFactor *= 1.1;
+  } else if (industryType === 'local') {
+    growthFactor *= 1.2;
+  }
+  
+  // Calculate traffic projections
+  const trafficDifference = targetTraffic - currentTraffic;
+  const data: VisualizationChartDataPoint[] = [];
+  
+  let cumulativeCost = 0;
+  let cumulativeAdditionalRevenue = 0;
+  
+  // Add month 0 (starting point)
+  data.push({
+    month: 0,
+    monthlyTraffic: currentTraffic,
+    monthlyAdditionalTraffic: 0,
+    monthlyCost: 0,
+    monthlyAdditionalRevenue: 0,
+    cumulativeCost: 0,
+    cumulativeAdditionalRevenue: 0,
+    cumulativeROI: 0,
+  });
+  
+  // Generate data for each month
+  for (let month = 1; month <= projectLength; month++) {
+    // S-curve growth model for traffic
+    const progressRatio = month / projectLength;
+    const growthRatio = 1 / (1 + Math.exp(-10 * (progressRatio - 0.5)));
+    const monthlyTraffic = currentTraffic + trafficDifference * growthRatio;
+    const monthlyAdditionalTraffic = monthlyTraffic - currentTraffic;
     
-    // Apply S-curve growth model
-    // Traffic(t) = MaxTraffic / (1 + e^-k(t-t0))
-    const sCurveFactor = 1 / (1 + Math.exp(-growthRate * (i - midpoint)));
+    // Calculate monthly cost (could be fixed or variable depending on requirements)
+    const monthlyTotalCost = monthlyCost;
+    cumulativeCost += monthlyTotalCost;
     
-    // Apply ramp-up period logic
-    // EffectiveValue(t) = ProjectedValue * (1 - e^(-t/rampUpPeriod))
-    const rampUpFactor = 1 - Math.exp(-i / rampUpPeriod);
+    // Calculate monthly additional revenue from additional traffic
+    const baselineMonthlyRevenue = (currentTraffic * conversionRate / 100) * averageOrderValue;
+    const projectedMonthlyRevenue = (monthlyTraffic * conversionRate / 100) * averageOrderValue;
+    const monthlyAdditionalRevenue = projectedMonthlyRevenue - baselineMonthlyRevenue;
     
-    // Calculate profit with growth factors
-    const profitForMonth = monthlyProfit * rampUpFactor * sCurveFactor;
-    cumulativeProfit += profitForMonth;
-
-    const monthlyROI = cumulativeInvestment > 0 
-      ? (cumulativeProfit - cumulativeInvestment) / cumulativeInvestment * 100 
+    cumulativeAdditionalRevenue += monthlyAdditionalRevenue;
+    
+    // Calculate ROI as percentage
+    const cumulativeROI = cumulativeCost > 0 
+      ? ((cumulativeAdditionalRevenue / cumulativeCost) - 1) * 100 
       : 0;
-
-    chartData.push({
-      month: `Month ${i}`,
-      cumulativeInvestment,
-      cumulativeProfit,
-      cumulativeROI: monthlyROI
+    
+    data.push({
+      month,
+      monthlyTraffic,
+      monthlyAdditionalTraffic,
+      monthlyCost: monthlyTotalCost,
+      monthlyAdditionalRevenue,
+      cumulativeCost,
+      cumulativeAdditionalRevenue,
+      cumulativeROI,
     });
   }
+  
+  return data;
+}
 
-  return chartData;
-};
+/**
+ * Calculate the exact break-even month based on chart data
+ */
+export function calculateBreakEvenMonth(chartData: VisualizationChartDataPoint[]): number {
+  for (let i = 1; i < chartData.length; i++) {
+    const prevMonth = chartData[i-1];
+    const currentMonth = chartData[i];
+    
+    if (prevMonth.cumulativeAdditionalRevenue < prevMonth.cumulativeCost && 
+        currentMonth.cumulativeAdditionalRevenue >= currentMonth.cumulativeCost) {
+      
+      // Linear interpolation to find exact break-even point
+      const costDiff = currentMonth.cumulativeCost - prevMonth.cumulativeCost;
+      const revDiff = currentMonth.cumulativeAdditionalRevenue - prevMonth.cumulativeAdditionalRevenue;
+      const surplus = prevMonth.cumulativeCost - prevMonth.cumulativeAdditionalRevenue;
+      const fraction = surplus / revDiff;
+      
+      return (i - 1) + fraction;
+    }
+  }
+  
+  // If break-even point isn't reached within the timeframe
+  return -1;
+}
 
 /**
  * Generates tailored recommendations based on calculated ROI and metrics
@@ -457,4 +556,163 @@ export const generateRecommendations = (
   }
 
   return recommendations;
+};
+
+/**
+ * Shared traffic projection model that ensures consistent calculations
+ * across all components of the calculator
+ * 
+ * @param {CalculatorState} state - Current calculator state
+ * @returns {number[]} Projected traffic values for each month
+ */
+export const generateTrafficProjection = (state: CalculatorState): number[] => {
+  const projectedTrafficData: number[] = [];
+  
+  // Determine domain authority factor based on current traffic
+  // Lower traffic sites grow slower, higher traffic sites grow faster
+  let domainAuthorityFactor = 0;
+  
+  // IMPROVED: Refined growth curve for sites with 500-1000 visitors
+  if (state.currentTraffic < 300) {
+    // Very new sites with minimal traffic (extremely slow growth)
+    domainAuthorityFactor = 0.07; 
+  } else if (state.currentTraffic >= 300 && state.currentTraffic < 500) {
+    // New sites with very low traffic
+    domainAuthorityFactor = 0.09;
+  } else if (state.currentTraffic >= 500 && state.currentTraffic < 1000) {
+    // IMPROVED: More granular factor for sites with 500-1000 visitors
+    domainAuthorityFactor = 0.12; 
+  } else if (state.currentTraffic >= 1000 && state.currentTraffic < 5000) {
+    // Growing sites with some established presence
+    domainAuthorityFactor = 0.20;
+  } else if (state.currentTraffic < 50000) {
+    // Established sites with decent authority
+    domainAuthorityFactor = 0.35;
+  } else if (state.currentTraffic < 200000) {
+    // Well-established sites with strong authority
+    domainAuthorityFactor = 0.45;
+  } else {
+    // Highly authoritative sites
+    domainAuthorityFactor = 0.55;
+  }
+
+  // Competition level adjustment
+  const extendedState = state as any; // Type assertion for optional competition level property
+  if (extendedState.competitionLevel) {
+    // IMPROVED: Adjust growth factor based on competition level
+    if (extendedState.competitionLevel === 'high') {
+      domainAuthorityFactor *= 0.8; // Slow down growth for high competition
+    } else if (extendedState.competitionLevel === 'low') {
+      domainAuthorityFactor *= 1.2; // Speed up growth for low competition
+    }
+  }
+  
+  // Growth curve parameters for different site maturity levels
+  const growthRate = domainAuthorityFactor; // Growth rate based on domain authority
+  
+  // Determine midpoint - shifts further out for less authoritative sites
+  let midpoint;
+  if (state.currentTraffic < 500) {
+    // New sites see most growth in latter half of the period
+    midpoint = Math.round(state.timeframe * 0.7);
+  } else if (state.currentTraffic < 5000) {
+    midpoint = Math.round(state.timeframe * 0.65);
+  } else {
+    midpoint = Math.round(state.timeframe * 0.6);
+  }
+  
+  // IMPROVED: Adjust flat period based on traffic and competition
+  let rampUpPeriod;
+  
+  // Determine base ramp-up period based on traffic level
+  if (state.currentTraffic < 300) {
+    rampUpPeriod = 7; // Longest ramp-up for very new sites
+  } else if (state.currentTraffic < 500) {
+    rampUpPeriod = 5; // Long ramp-up for new sites
+  } else if (state.currentTraffic < 1000) {
+    // IMPROVED: More realistic ramp-up for sites with 500-1000 visitors
+    rampUpPeriod = 4; 
+  } else if (state.currentTraffic < 5000) {
+    rampUpPeriod = 3; // Moderate ramp-up for growing sites
+  } else {
+    rampUpPeriod = 2; // Shorter ramp-up for established sites
+  }
+  
+  // Adjust ramp-up period based on competition level if available
+  if (extendedState.competitionLevel) {
+    if (extendedState.competitionLevel === 'high') {
+      rampUpPeriod += 1; // Add a month for high competition
+    } else if (extendedState.competitionLevel === 'low') {
+      rampUpPeriod = Math.max(1, rampUpPeriod - 1); // Reduce by a month for low competition, but minimum 1
+    }
+  }
+  
+  // Generate initial data points using S-curve growth
+  const tempProjectedData: number[] = [];
+  
+  // Generate data points for each month using S-curve growth
+  for (let i = 0; i <= state.timeframe; i++) {
+    // For low-traffic sites, introduce an initial flat period with negligible growth
+    let trafficIncrease = 0;
+    const trafficDifference = state.targetTraffic - state.currentTraffic;
+    
+    // IMPROVED: More nuanced initial growth for different traffic segments
+    if (state.currentTraffic < 300 && i <= 3) {
+      // Almost no growth in first 3 months for brand new sites
+      trafficIncrease = trafficDifference * 0.005 * i;
+    } else if (state.currentTraffic < 500 && i <= 2) {
+      // Very slow initial growth for new sites
+      trafficIncrease = trafficDifference * 0.015 * i;
+    } else if (state.currentTraffic < 1000 && i <= 1) {
+      // Slightly faster initial growth for sites with 500-1000 visitors
+      trafficIncrease = trafficDifference * 0.025 * i;
+    } else {
+      // S-curve growth model
+      // First apply ramp-up period logic
+      // No significant results until a few months in for SEO
+      const rampUpFactor = 1 - Math.exp(-i / rampUpPeriod);
+      
+      // Then apply S-curve growth model
+      const sCurveFactor = 1 / (1 + Math.exp(-growthRate * (i - midpoint)));
+      
+      // Combine factors to get actual traffic increase
+      trafficIncrease = trafficDifference * sCurveFactor * rampUpFactor;
+    }
+    
+    // CONSISTENT ROUNDING: Always round to integers for traffic values
+    tempProjectedData.push(Math.round(state.currentTraffic + trafficIncrease));
+  }
+  
+  // Now normalize the data to ensure we reach the target traffic by the end of the timeframe
+  // This preserves the growth curve shape but ensures we hit the target
+  const finalGeneratedTraffic = tempProjectedData[state.timeframe];
+  const targetTraffic = state.targetTraffic;
+  
+  // Only apply normalization if we're not already reaching the target 
+  // and the target is greater than current traffic
+  if (finalGeneratedTraffic !== targetTraffic && targetTraffic > state.currentTraffic) {
+    const correctionFactor = (targetTraffic - state.currentTraffic) / (finalGeneratedTraffic - state.currentTraffic);
+    
+    for (let i = 0; i <= state.timeframe; i++) {
+      // Apply the correction while preserving the S-curve shape
+      if (i === 0) {
+        // Month 0 is always current traffic
+        projectedTrafficData.push(state.currentTraffic);
+      } else if (i === state.timeframe) {
+        // Last month is always exactly the target traffic
+        projectedTrafficData.push(targetTraffic);
+      } else {
+        // Adjust intermediate months proportionally
+        const originalIncrease = tempProjectedData[i] - state.currentTraffic;
+        const adjustedIncrease = originalIncrease * correctionFactor;
+        // CONSISTENT ROUNDING: Always round to integers for traffic values
+        projectedTrafficData.push(Math.round(state.currentTraffic + adjustedIncrease));
+      }
+    }
+  } else {
+    // If we're already reaching target or target is below current, use the original data
+    projectedTrafficData.push(...tempProjectedData);
+  }
+  
+  return projectedTrafficData;
 }; 

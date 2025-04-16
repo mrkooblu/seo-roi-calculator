@@ -1,6 +1,100 @@
 # SEO ROI Calculator
 
-A sophisticated web application for calculating the return on investment (ROI) of SEO campaigns. Built with Next.js, TypeScript, and Styled-Components.
+A comprehensive tool to calculate and visualize the return on investment for SEO campaigns.
+
+## Key Features
+
+- **Advanced Traffic Growth Modeling**: Utilizes an S-curve growth model adjusted for domain authority, competition level, and industry type
+- **Precise Break-Even Calculation**: Determines the exact month when SEO investment begins generating positive ROI, with fractional month precision
+- **Interactive Visualization**: Clear charts showing traffic growth, revenue projections, and ROI over time
+- **Visual Break-Even Indicator**: Clearly highlights the break-even point on charts
+- **Comprehensive Testing Framework**: Ensures calculation accuracy and consistency
+
+## Recent Improvements
+
+### Enhanced Calculation Precision
+
+- Refined traffic growth model incorporating domain authority, competition, and industry factors
+- Implemented S-curve growth pattern for realistic traffic projections
+- Added fractional month precision for break-even point calculation using linear interpolation
+
+### Unified Calculation Pipeline
+
+- Centralized calculation functions for better maintainability
+- Improved type safety with proper TypeScript interfaces
+- Consistent methodology across all chart types
+
+### Improved Chart Clarity
+
+- Added visual break-even indicator with vertical line and highlighted region
+- Enhanced tooltip information for better data interpretation
+- Consistent styling across all visualization components
+
+### Robust Testing Framework
+
+- Added unit tests for core calculation functions
+- Created consistency verification between different calculation methods
+- Added visualization validation tools for break-even indicator
+
+## Development Tools
+
+### Running Tests
+
+To verify calculations are working correctly, visit the test utility:
+
+```
+/dev/test-calculator
+```
+
+This page runs a suite of tests to ensure consistency between:
+- Break-even calculations and chart data
+- Traffic projection algorithms
+- Revenue projections
+
+### Visual Validation
+
+To validate the visual representation of the break-even indicator:
+
+```
+/dev/visualization-test
+```
+
+This tool allows you to:
+- Adjust calculation inputs and see how the break-even indicator responds
+- Verify that the indicator position matches the calculated break-even month
+- Test different scenarios with varying growth patterns
+
+## Calculation Methodology
+
+### Traffic Growth Model
+
+The traffic projection uses an S-curve growth pattern:
+1. Initial slow growth phase
+2. Accelerated middle growth phase
+3. Plateau as it approaches the target traffic
+
+Growth factors are adjusted based on:
+- Keyword difficulty
+- Competition level
+- Industry type
+- Current domain authority
+
+### Break-Even Calculation
+
+The break-even point is calculated by:
+1. Generating monthly traffic projections
+2. Converting traffic to revenue using conversion rate and average order value
+3. Calculating cumulative cost and revenue increase for each month
+4. Finding the exact point (with fractional precision) where cumulative revenue equals cumulative cost
+
+## Troubleshooting
+
+If the calculations seem inconsistent:
+
+1. Check that all inputs have reasonable values
+2. Verify that traffic projections follow expected growth patterns
+3. Run the test utility to check for calculation errors
+4. Use the visualization test to verify break-even indicator placement
 
 ## Features
 
@@ -14,10 +108,10 @@ A sophisticated web application for calculating the return on investment (ROI) o
 
 ## Technology Stack
 
-- **Next.js**: For server-side rendering and optimal SEO
+- **Next.js**: For optimized rendering and improved performance
 - **TypeScript**: For type safety and improved developer experience
 - **Styled-Components**: For component-based styling
-- **Chart.js**: For data visualization
+- **Chart.js**: For data visualization with annotations and custom tooltips
 - **React**: For building the UI components
 
 ## Getting Started
@@ -69,11 +163,10 @@ The Basic Calculator allows you to enter the essential metrics needed to calcula
 The Advanced Calculator provides additional options for more detailed analysis:
 
 1. **All Basic Calculator Fields**: Includes all metrics from the Basic Calculator
-2. **Organic CTR (%)**: The percentage of impressions that result in clicks
-3. **Keyword Difficulty**: Measures how competitive your target keywords are (1-100)
-4. **Competition Level**: Your industry's SEO competitiveness (Low/Medium/High)
-5. **Industry Type**: Your business category for tailored recommendations
-6. **Investment Breakdown**: How your SEO budget is allocated (Content/Link Building/Technical SEO)
+2. **Keyword Difficulty**: Measures how competitive your target keywords are (1-100)
+3. **Competition Level**: Your industry's SEO competitiveness (Low/Medium/High)
+4. **Industry Type**: Your business category for tailored recommendations
+5. **Investment Breakdown**: How your SEO budget is allocated (Content/Link Building/Technical SEO)
 
 ### Understanding Results
 
@@ -105,12 +198,14 @@ src/
 │   ├── Calculator/    # Calculator components
 │   ├── Form/          # Form input components
 │   ├── Layout/        # Layout components
+│   ├── common/        # Shared UI components
 │   └── Results/       # Results visualization components
 ├── hooks/             # Custom React hooks
 ├── pages/             # Next.js pages
 ├── styles/            # Global styles and theme
 │   ├── theme.ts       # Theme configuration
 │   └── GlobalStyle.ts # Global style settings
+├── utils/             # Utility functions
 └── types/             # TypeScript type definitions
 ```
 
@@ -121,6 +216,7 @@ src/
 - **Calculator**: Main container that manages calculator mode and results display
 - **BasicCalculator**: Simplified calculator with essential metrics
 - **AdvancedCalculator**: Detailed calculator with additional options
+- **CalculatorTabs**: Navigation between Basic and Advanced calculator modes
 
 ### Form Components
 
@@ -132,13 +228,15 @@ src/
 
 - **Results**: Displays calculation results, charts, and recommendations
 - **ROIChart**: Renders interactive charts using Chart.js
+- **ChartComponent**: Core chart rendering with break-even annotations
+- **ResultItem**: Displays individual metric results
 - **Recommendations**: Shows tailored SEO strategy recommendations
 
 ### Layout Components
 
 - **Layout**: Main layout wrapper with theme provider
 - **Container**: Responsive container with consistent width
-- **Header**: Application header with navigation
+- **PageHeader**: Application header with title and description
 
 ## Contributing
 

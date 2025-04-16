@@ -102,7 +102,10 @@ const Results: React.FC<ResultsProps> = ({ results, timeframe }) => {
             </CustomTooltipWrapper>
           </SectionTitleWrapper>
           <ChartContainer>
-            <ROIChart data={trafficGrowthChart} />
+            <ROIChart 
+              data={trafficGrowthChart} 
+              chartType="trafficGrowth"
+            />
           </ChartContainer>
           <ChartNote>SEO results take time, with slower growth in the early months and acceleration later</ChartNote>
         </ChartSection>
@@ -120,7 +123,10 @@ const Results: React.FC<ResultsProps> = ({ results, timeframe }) => {
             </CustomTooltipWrapper>
           </SectionTitleWrapper>
           <ChartContainer>
-            <ROIChart data={revenueGrowthChart} />
+            <ROIChart 
+              data={revenueGrowthChart} 
+              chartType="revenueGrowth"
+            />
           </ChartContainer>
           <ChartNote>Revenue follows the same growth pattern as traffic - gradual at first, then accelerating</ChartNote>
         </ChartSection>
@@ -138,9 +144,18 @@ const Results: React.FC<ResultsProps> = ({ results, timeframe }) => {
             </CustomTooltipWrapper>
           </SectionTitleWrapper>
           <ChartContainer>
-            <ROIChart data={roiComparisonChart} />
+            <ROIChart 
+              data={roiComparisonChart} 
+              breakEvenMonth={breakEvenMonth}
+              chartType="roiComparison"
+            />
           </ChartContainer>
           <ChartNote>Break-even occurs when the blue bars (cumulative revenue) exceed the red bars (cumulative cost)</ChartNote>
+          {breakEvenMonth && (
+            <BreakEvenNote>
+              <span>Based on these projections, you will reach break-even in Month {breakEvenMonth}</span>
+            </BreakEvenNote>
+          )}
         </ChartSection>
 
         <RecommendationsSection>
@@ -278,6 +293,18 @@ const ChartNote = styled.p`
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
   color: ${({ theme }) => theme.colors.text.secondary};
   margin-top: ${({ theme }) => theme.spacing.md};
+  text-align: center;
+`;
+
+const BreakEvenNote = styled.div`
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  background-color: rgba(255, 99, 132, 0.1);
+  border-left: 3px solid rgba(255, 99, 132, 0.8);
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  color: ${({ theme }) => theme.colors.text.primary};
   text-align: center;
 `;
 

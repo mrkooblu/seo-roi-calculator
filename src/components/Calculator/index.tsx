@@ -21,23 +21,36 @@ const Calculator: React.FC = () => {
   };
 
   const handleCalculate = () => {
+    // First run validation
+    const validationResult = calculateResults();
+    
+    // If validation failed, scroll to error summary
+    if (!validationResult) {
+      setTimeout(() => {
+        document.getElementById('error-summary')?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+      return;
+    }
+    
     setIsCalculating(true);
     
     // Simulate calculation delay for better UX
     setTimeout(() => {
-      const calculationResults = calculateResults();
       setIsCalculating(false);
       
-      if (calculationResults) {
-        setResults(calculationResults);
-        // Smooth scroll to results
-        setTimeout(() => {
-          document.getElementById('results-section')?.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }, 100);
-      }
+      // We already validated and have the results, so just set them
+      setResults(validationResult);
+      
+      // Smooth scroll to results
+      setTimeout(() => {
+        document.getElementById('results-section')?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
     }, 1200);
   };
 
@@ -64,6 +77,16 @@ const Calculator: React.FC = () => {
       </CalculatorTabs>
 
       <CalculatorContent>
+        {errors.calculationError && (
+          <PrecisionErrorAlert id="precision-error-alert">
+            <AlertIcon>⚠️</AlertIcon>
+            <AlertContent>
+              <AlertTitle>Calculation Error</AlertTitle>
+              <AlertMessage>{errors.calculationError}</AlertMessage>
+            </AlertContent>
+          </PrecisionErrorAlert>
+        )}
+        
         <CalculatorForm>
           {calculatorMode === 'basic' ? (
             <BasicCalculator 
@@ -90,12 +113,14 @@ const Calculator: React.FC = () => {
             <Button onClick={handleReset} disabled={isCalculating}>Reset</Button>
           </ButtonGroup>
 
-          {Object.keys(errors).length > 0 && (
-            <ErrorSummary>
+          {Object.keys(errors).length > 0 && !errors.calculationError && (
+            <ErrorSummary id="error-summary">
               <ErrorTitle>Please fix the following errors:</ErrorTitle>
               <ErrorList>
                 {Object.entries(errors).map(([field, message]) => (
-                  <ErrorItem key={field}>{message}</ErrorItem>
+                  <ErrorItem key={field} $isCalculationError={field === 'calculationError'}>
+                    {message}
+                  </ErrorItem>
                 ))}
               </ErrorList>
             </ErrorSummary>
@@ -234,10 +259,46 @@ const ErrorList = styled.ul`
   padding-left: ${({ theme }) => theme.spacing.lg};
 `;
 
-const ErrorItem = styled.li`
+const ErrorItem = styled.li<{ $isCalculationError?: boolean }>`
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
   color: ${({ theme }) => theme.colors.danger};
   margin-bottom: ${({ theme }) => theme.spacing.xs};
+  font-weight: ${(props) => props.$isCalculationError ? 'bold' : 'normal'};
+`;
+
+const PrecisionErrorAlert = styled.div`
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  background-color: #FEF2F2;
+  border: 1px solid #F87171;
+  animation: ${fadeIn} 0.5s ease-out;
+`;
+
+const AlertIcon = styled.div`
+  font-size: 24px;
+  margin-right: ${({ theme }) => theme.spacing.sm};
+  display: flex;
+  align-items: center;
+`;
+
+const AlertContent = styled.div`
+  flex: 1;
+`;
+
+const AlertTitle = styled.h4`
+  font-size: ${({ theme }) => theme.typography.fontSize.lg};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semiBold};
+  color: #DC2626;
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
+`;
+
+const AlertMessage = styled.p`
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  line-height: 1.5;
+  color: #B91C1C;
 `;
 
 export default Calculator; 

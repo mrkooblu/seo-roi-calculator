@@ -11,12 +11,22 @@ const ChartComponent = dynamic(
 
 interface ROIChartProps {
   data: ChartData;
+  breakEvenMonth?: number;
+  chartType?: string;
 }
 
-const ROIChart: React.FC<ROIChartProps> = ({ data }) => {
+const ROIChart: React.FC<ROIChartProps> = ({ 
+  data, 
+  breakEvenMonth, 
+  chartType 
+}) => {
   return (
     <ChartContainer>
-      <ChartComponent data={data} />
+      <ChartComponent 
+        data={data} 
+        breakEvenMonth={breakEvenMonth}
+        chartType={chartType}
+      />
     </ChartContainer>
   );
 };

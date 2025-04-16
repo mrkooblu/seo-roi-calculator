@@ -17,6 +17,9 @@ export interface CalculatorState {
   
   // Other state
   timeframe: number; // in months
+  
+  // Error state
+  error?: string | null; // Optional error message for validation failures
 }
 
 export interface CalculationResults {

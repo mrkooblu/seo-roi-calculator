@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { CalculatorState } from '../../types';
 import FormGroup from '../Form/FormGroup';
@@ -13,16 +13,238 @@ interface AdvancedCalculatorProps {
 const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateState, getFieldError }) => {
   const [domainInput, setDomainInput] = React.useState('');
   const [keywordInput, setKeywordInput] = React.useState('');
+  const [warnings, setWarnings] = useState<Record<string, string>>({});
+  
+  // Calculate the total investment allocation percentage
+  const totalInvestment = (
+    (state.contentInvestment || 0) + 
+    (state.linkBuildingInvestment || 0) + 
+    (state.technicalSEOInvestment || 0)
+  );
+
+  // Determine if we need to show the allocation warning
+  const showAllocationWarning = totalInvestment !== 100 && 
+    (state.contentInvestment !== undefined && state.contentInvestment !== null) &&
+    (state.linkBuildingInvestment !== undefined && state.linkBuildingInvestment !== null) && 
+    (state.technicalSEOInvestment !== undefined && state.technicalSEOInvestment !== null);
+
+  // Auto-adjust the third value when two values are set to make total 100%
+  const autoBalanceInvestments = (name: string, value: number) => {
+    // If we have two fields with values and the current field is one of them
+    const contentSet = name !== 'contentInvestment' && state.contentInvestment !== undefined && state.contentInvestment !== null;
+    const linkSet = name !== 'linkBuildingInvestment' && state.linkBuildingInvestment !== undefined && state.linkBuildingInvestment !== null;
+    const technicalSet = name !== 'technicalSEOInvestment' && state.technicalSEOInvestment !== undefined && state.technicalSEOInvestment !== null;
+    
+    // If exactly two fields are already set (including the one being edited)
+    if ([contentSet, linkSet, technicalSet].filter(Boolean).length === 1) {
+      // Calculate what the third field should be to make total 100%
+      let thirdField = '';
+      let calculatedValue = 0;
+      
+      if (!contentSet && name !== 'contentInvestment') {
+        thirdField = 'contentInvestment';
+        calculatedValue = 100 - value - (linkSet ? state.linkBuildingInvestment : state.technicalSEOInvestment);
+      } else if (!linkSet && name !== 'linkBuildingInvestment') {
+        thirdField = 'linkBuildingInvestment';
+        calculatedValue = 100 - value - (contentSet ? state.contentInvestment : state.technicalSEOInvestment);
+      } else if (!technicalSet && name !== 'technicalSEOInvestment') {
+        thirdField = 'technicalSEOInvestment';
+        calculatedValue = 100 - value - (contentSet ? state.contentInvestment : state.linkBuildingInvestment);
+      }
+      
+      // Only auto-adjust if the calculated value is valid (non-negative)
+      if (thirdField && calculatedValue >= 0) {
+        setWarnings({
+          ...warnings,
+          [thirdField]: `Auto-adjusted to ${calculatedValue}% to make total 100%`
+        });
+        clearWarningAfterDelay(thirdField);
+        
+        // Update the third field
+        updateState({ [thirdField]: calculatedValue });
+      }
+    }
+  };
+  
+  // Clear warning for a field after 5 seconds
+  const clearWarningAfterDelay = (fieldName: string) => {
+    setTimeout(() => {
+      setWarnings(prev => {
+        const newWarnings = { ...prev };
+        delete newWarnings[fieldName];
+        return newWarnings;
+      });
+    }, 5000);
+  };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
+    // Handle different input types differently
     if (e.target.type === 'number') {
+      // Allow empty input for better user experience
+      if (value === '') {
+        updateState({ [name]: '' });
+        return;
+      }
+      
       const numValue = parseFloat(value);
-      if (!isNaN(numValue) || value === '') {
-        updateState({ [name]: value === '' ? 0 : numValue });
+      
+      // Check if it's a valid number
+      if (isNaN(numValue)) {
+        return; // Ignore invalid number inputs
+      }
+      
+      // Prevent negative values
+      if (numValue < 0) {
+        setWarnings({
+          ...warnings,
+          [name]: `Negative values are not allowed for ${name}`
+        });
+        clearWarningAfterDelay(name);
+        return; // Don't update state for negative values
+      }
+      
+      // Handle specific field constraints
+      switch (name) {
+        case 'conversionRate':
+          // Cap conversion rate at 100%
+          if (numValue > 100) {
+            updateState({ [name]: 100 });
+            setWarnings({
+              ...warnings,
+              [name]: 'Conversion rate capped at a maximum of 100%'
+            });
+            clearWarningAfterDelay(name);
+          } else {
+            updateState({ [name]: numValue });
+          }
+          break;
+        
+        case 'keywordDifficulty':
+          // Ensure keyword difficulty is between 1-100
+          if (numValue < 1) {
+            updateState({ [name]: 1 });
+            setWarnings({
+              ...warnings,
+              [name]: 'Keyword difficulty set to minimum value of 1'
+            });
+            clearWarningAfterDelay(name);
+          } else if (numValue > 100) {
+            updateState({ [name]: 100 });
+            setWarnings({
+              ...warnings,
+              [name]: 'Keyword difficulty capped at maximum value of 100'
+            });
+            clearWarningAfterDelay(name);
+          } else {
+            updateState({ [name]: numValue });
+          }
+          break;
+          
+        case 'targetTraffic':
+          // Ensure target traffic is greater than current traffic
+          if (numValue <= state.currentTraffic && numValue > 0) {
+            updateState({ [name]: state.currentTraffic + 1 });
+            setWarnings({
+              ...warnings,
+              [name]: `Target traffic must be greater than current traffic (${state.currentTraffic})`
+            });
+            clearWarningAfterDelay(name);
+          } else if (numValue > 10000000) {
+            updateState({ [name]: numValue });
+            setWarnings({
+              ...warnings,
+              [name]: 'High traffic values may produce less accurate projections'
+            });
+            clearWarningAfterDelay(name);
+          } else {
+            updateState({ [name]: numValue });
+          }
+          break;
+          
+        case 'contentInvestment':
+        case 'linkBuildingInvestment':
+        case 'technicalSEOInvestment':
+          // These percentages should total 100%
+          updateState({ [name]: numValue });
+          
+          // Try to auto-balance investments
+          autoBalanceInvestments(name, numValue);
+          
+          // Check if we're close to 100% total
+          const updatedState = {
+            ...state,
+            [name]: numValue
+          };
+          
+          const total = (
+            (name === 'contentInvestment' ? numValue : updatedState.contentInvestment || 0) +
+            (name === 'linkBuildingInvestment' ? numValue : updatedState.linkBuildingInvestment || 0) +
+            (name === 'technicalSEOInvestment' ? numValue : updatedState.technicalSEOInvestment || 0)
+          );
+          
+          if (total > 100) {
+            setWarnings({
+              ...warnings,
+              [name]: `Total investment allocation exceeds 100% (currently ${total}%)`
+            });
+            clearWarningAfterDelay(name);
+          } else if (total < 100 && total >= 90 && total !== 0) {
+            // Only show warning when we're close but not exactly at 100%
+            setWarnings({
+              ...warnings,
+              [name]: `Total investment allocation is ${total}%, should sum to 100%`
+            });
+            clearWarningAfterDelay(name);
+          }
+          break;
+          
+        case 'timeframe':
+          // Cap timeframe at 60 months
+          if (numValue > 60) {
+            updateState({ [name]: 60 });
+            setWarnings({
+              ...warnings,
+              [name]: 'Timeframe capped at 60 months'
+            });
+            clearWarningAfterDelay(name);
+          } else {
+            updateState({ [name]: numValue });
+          }
+          break;
+          
+        case 'averageOrderValue':
+          if (numValue > 10000) {
+            updateState({ [name]: numValue });
+            setWarnings({
+              ...warnings,
+              [name]: 'High order values may impact calculation accuracy'
+            });
+            clearWarningAfterDelay(name);
+          } else {
+            updateState({ [name]: numValue });
+          }
+          break;
+          
+        case 'monthlySEOCost':
+          if (numValue > 100000) {
+            updateState({ [name]: numValue });
+            setWarnings({
+              ...warnings,
+              [name]: 'Extremely high monthly SEO costs entered'
+            });
+            clearWarningAfterDelay(name);
+          } else {
+            updateState({ [name]: numValue });
+          }
+          break;
+          
+        default:
+          updateState({ [name]: numValue });
       }
     } else {
+      // Handle non-number inputs (like select elements)
       updateState({ [name]: value });
     }
   };
@@ -78,6 +300,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             placeholder="e.g. 1000"
             error={getFieldError('currentTraffic')}
           />
+          {getFieldError('currentTraffic') && (
+            <ErrorText>{getFieldError('currentTraffic')}</ErrorText>
+          )}
+          {warnings.currentTraffic && (
+            <WarningText>{warnings.currentTraffic}</WarningText>
+          )}
         </FormGroup>
         
         <FormGroup
@@ -96,6 +324,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             placeholder="e.g. 2000"
             error={getFieldError('targetTraffic')}
           />
+          {getFieldError('targetTraffic') && (
+            <ErrorText>{getFieldError('targetTraffic')}</ErrorText>
+          )}
+          {warnings.targetTraffic && (
+            <WarningText>{warnings.targetTraffic}</WarningText>
+          )}
         </FormGroup>
         
         <FormGroup
@@ -117,6 +351,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             suffix="%"
             error={getFieldError('conversionRate')}
           />
+          {getFieldError('conversionRate') && (
+            <ErrorText>{getFieldError('conversionRate')}</ErrorText>
+          )}
+          {warnings.conversionRate && (
+            <WarningText>{warnings.conversionRate}</WarningText>
+          )}
         </FormGroup>
         
         <FormGroup
@@ -137,6 +377,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             prefix="$"
             error={getFieldError('averageOrderValue')}
           />
+          {getFieldError('averageOrderValue') && (
+            <ErrorText>{getFieldError('averageOrderValue')}</ErrorText>
+          )}
+          {warnings.averageOrderValue && (
+            <WarningText>{warnings.averageOrderValue}</WarningText>
+          )}
         </FormGroup>
       </FormGrid>
       
@@ -160,6 +406,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             max="100"
             error={getFieldError('keywordDifficulty')}
           />
+          {getFieldError('keywordDifficulty') && (
+            <ErrorText>{getFieldError('keywordDifficulty')}</ErrorText>
+          )}
+          {warnings.keywordDifficulty && (
+            <WarningText>{warnings.keywordDifficulty}</WarningText>
+          )}
         </FormGroup>
         
         <FormGroup
@@ -249,7 +501,14 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
       </FormGrid>
       
       <SectionTitle>Investment Breakdown</SectionTitle>
-      <InvestmentNote>These three percentages should add up to 100%</InvestmentNote>
+      <InvestmentNote>
+        These three percentages should add up to 100%
+      </InvestmentNote>
+      {showAllocationWarning && 
+        <TotalDisplay $isValid={totalInvestment === 100}>
+          Current Total: <strong>{totalInvestment}%</strong> {totalInvestment !== 100 ? '(should be 100%)' : '✓'}
+        </TotalDisplay>
+      }
       <FormGrid>
         <FormGroup
           id="contentInvestment"
@@ -269,6 +528,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             suffix="%"
             error={getFieldError('contentInvestment')}
           />
+          {getFieldError('contentInvestment') && (
+            <ErrorText>{getFieldError('contentInvestment')}</ErrorText>
+          )}
+          {warnings.contentInvestment && (
+            <WarningText>{warnings.contentInvestment}</WarningText>
+          )}
         </FormGroup>
         
         <FormGroup
@@ -289,6 +554,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             suffix="%"
             error={getFieldError('linkBuildingInvestment')}
           />
+          {getFieldError('linkBuildingInvestment') && (
+            <ErrorText>{getFieldError('linkBuildingInvestment')}</ErrorText>
+          )}
+          {warnings.linkBuildingInvestment && (
+            <WarningText>{warnings.linkBuildingInvestment}</WarningText>
+          )}
         </FormGroup>
         
         <FormGroup
@@ -309,6 +580,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             suffix="%"
             error={getFieldError('technicalSEOInvestment')}
           />
+          {getFieldError('technicalSEOInvestment') && (
+            <ErrorText>{getFieldError('technicalSEOInvestment')}</ErrorText>
+          )}
+          {warnings.technicalSEOInvestment && (
+            <WarningText>{warnings.technicalSEOInvestment}</WarningText>
+          )}
         </FormGroup>
         
         <FormGroup
@@ -349,6 +626,12 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
             max="60"
             error={getFieldError('timeframe')}
           />
+          {getFieldError('timeframe') && (
+            <ErrorText>{getFieldError('timeframe')}</ErrorText>
+          )}
+          {warnings.timeframe && (
+            <WarningText>{warnings.timeframe}</WarningText>
+          )}
         </FormGroup>
       </FormGrid>
     </AdvancedCalculatorContainer>
@@ -387,6 +670,15 @@ const InvestmentNote = styled.p`
   color: ${({ theme }) => theme.colors.text.secondary};
   font-style: italic;
   margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
+
+const TotalDisplay = styled.div<{ $isValid: boolean }>`
+  color: ${({ theme, $isValid }) => $isValid ? theme.colors.success : theme.colors.warning};
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  margin-top: ${({ theme }) => theme.spacing.xs};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+  display: flex;
+  align-items: center;
 `;
 
 const FormGrid = styled.div`
@@ -498,6 +790,25 @@ const AnalyzeButton = styled.button`
   
   &:hover {
     background-color: ${({ theme }) => theme.colors.primaryHover};
+  }
+`;
+
+const ErrorText = styled.div`
+  color: ${({ theme }) => theme.colors.danger};
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  margin-top: ${({ theme }) => theme.spacing.xs};
+`;
+
+const WarningText = styled.div`
+  color: #FF9900;
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  margin-top: ${({ theme }) => theme.spacing.xs};
+  display: flex;
+  align-items: center;
+  
+  &:before {
+    content: "⚠️";
+    margin-right: ${({ theme }) => theme.spacing.xs};
   }
 `;
 
