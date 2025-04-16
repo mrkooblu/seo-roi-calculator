@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { CalculatorState } from '../types';
 // Import specific functions from useCalculatorState
 import { useCalculatorState } from '../hooks/useCalculatorState';

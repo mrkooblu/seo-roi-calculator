@@ -1,6 +1,5 @@
-/* eslint-disable */
 import { CalculatorInputs, AdvancedCalculatorInputs, CompetitionLevel } from '../types/calculator';
-import { CalculationResults, RecommendationItem } from '../types/results';
+import { CalculationResults, ChartDataPoint, RecommendationItem } from '../types/results';
 import { CalculatorState } from '../types';
 
 // Define a type for extended inputs that might be cast from basic inputs
@@ -92,10 +91,9 @@ export const calculateROI = (inputs: CalculatorInputs): CalculationResults => {
     
     // Apply S-curve growth model
     // Traffic(t) = MaxTraffic / (1 + e^-k(t-t0))
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const growthFactor = 0.3; // Growth rate parameter
+    const growthRate = 0.3; // Growth rate parameter
     const midpoint = timePeriod / 2; // Midpoint of growth curve
-    const sCurveFactor = 1 / (1 + Math.exp(-growthFactor * (t - midpoint)));
+    const sCurveFactor = 1 / (1 + Math.exp(-growthRate * (t - midpoint)));
     
     // Monthly profit applying growth factors
     const monthProfitAtTimeT = monthlyProfit * rampUpFactor * sCurveFactor;
@@ -313,8 +311,7 @@ export function generateChartData(state: {
   } = state;
   
   // Calculate growth rate factors based on competition and domain metrics
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const growthFactor = 0.2; // Default growth rate
+  let growthFactor = 0.2; // Default growth rate
   
   // Adjust growth factor based on domain authority
   if (domainAuthority < 20) {
@@ -407,7 +404,6 @@ export function calculateBreakEvenMonth(chartData: VisualizationChartDataPoint[]
         currentMonth.cumulativeAdditionalRevenue >= currentMonth.cumulativeCost) {
       
       // Linear interpolation to find exact break-even point
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const costDiff = currentMonth.cumulativeCost - prevMonth.cumulativeCost;
       const revDiff = currentMonth.cumulativeAdditionalRevenue - prevMonth.cumulativeAdditionalRevenue;
       const surplus = prevMonth.cumulativeCost - prevMonth.cumulativeAdditionalRevenue;
@@ -719,12 +715,4 @@ export const generateTrafficProjection = (state: CalculatorState): number[] => {
   }
   
   return projectedTrafficData;
-};
-
-// Create a properly typed ExtendedState interface to replace 'any'
-interface ExtendedState extends CalculatorState {
-  [key: string]: any; // Allow additional dynamic properties in a type-safe way
-}
-
-// Replace any with ExtendedState
-const state = inputs as ExtendedState; 
+}; 

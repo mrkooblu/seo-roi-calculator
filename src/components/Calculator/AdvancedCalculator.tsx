@@ -143,24 +143,8 @@ const AdvancedCalculator: React.FC<AdvancedCalculatorProps> = ({ state, updateSt
           break;
           
         case 'targetTraffic':
-          // Ensure target traffic is greater than current traffic
-          if (numValue <= state.currentTraffic && numValue > 0) {
-            updateState({ [name]: state.currentTraffic + 1 });
-            setWarnings({
-              ...warnings,
-              [name]: `Target traffic must be greater than current traffic (${state.currentTraffic})`
-            });
-            clearWarningAfterDelay(name);
-          } else if (numValue > 10000000) {
-            updateState({ [name]: numValue });
-            setWarnings({
-              ...warnings,
-              [name]: 'High traffic values may produce less accurate projections'
-            });
-            clearWarningAfterDelay(name);
-          } else {
-            updateState({ [name]: numValue });
-          }
+          // Just update the state without showing validation warnings during input
+          updateState({ [name]: numValue });
           break;
           
         case 'contentInvestment':

@@ -132,12 +132,12 @@ const generateTrafficProjection = (state: CalculatorState): number[] => {
   }
 
   // Competition level adjustment
-  // Use a type-safe approach without 'any'
-  if (state.competitionLevel) {
+  const extendedState = state as any; // Type assertion for optional competition level property
+  if (extendedState.competitionLevel) {
     // IMPROVED: Adjust growth factor based on competition level
-    if (state.competitionLevel === 'high') {
+    if (extendedState.competitionLevel === 'high') {
       domainAuthorityFactor *= 0.8; // Slow down growth for high competition
-    } else if (state.competitionLevel === 'low') {
+    } else if (extendedState.competitionLevel === 'low') {
       domainAuthorityFactor *= 1.2; // Speed up growth for low competition
     }
   }
@@ -174,10 +174,10 @@ const generateTrafficProjection = (state: CalculatorState): number[] => {
   }
   
   // Adjust ramp-up period based on competition level if available
-  if (state.competitionLevel) {
-    if (state.competitionLevel === 'high') {
+  if (extendedState.competitionLevel) {
+    if (extendedState.competitionLevel === 'high') {
       rampUpPeriod += 1; // Add a month for high competition
-    } else if (state.competitionLevel === 'low') {
+    } else if (extendedState.competitionLevel === 'low') {
       rampUpPeriod = Math.max(1, rampUpPeriod - 1); // Reduce by a month for low competition, but minimum 1
     }
   }
@@ -429,10 +429,6 @@ export const useCalculatorState = () => {
     getFieldError,
     updateValidationErrors 
   } = useFormValidation();
-
-  // Mark validateCalculatorInputs as unused to satisfy linter
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const unused = validateCalculatorInputs;
 
   /**
    * Updates the calculator state with new values
