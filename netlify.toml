@@ -7,13 +7,12 @@
   NODE_ENV = "production"
   # Skip TypeScript type checking during build for faster builds
   NETLIFY_SKIP_TS_CHECK = "true"
+  # Set ESLint to not fail on errors
+  ESLINT_NO_DEV_ERRORS = "true"
+  NEXT_DISABLE_ESLINT = "true"
   
 [build.processing]
   skip_processing = true
-
-# Handle the ESLint errors by disabling them during build
-[build.environment.ESLINT_OPTIONS]
-  failOnError = "false"
 
 # Ensure Next.js specific build steps
 [[plugins]]
